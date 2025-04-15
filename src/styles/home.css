@@ -1,0 +1,188 @@
+/* Основные стили для домашней страницы */
+.home-section {
+  background-color: var(--background-secondary);
+  padding: 60px;
+  border-radius: 24px;
+  margin: 40px 0;
+  box-shadow: var(--card-shadow);
+}
+
+.feature-card {
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
+  padding: 40px 30px;
+  height: 100%;
+  cursor: pointer;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--card-shadow);
+}
+
+.feature-card h3 {
+  color: var(--text-primary);
+  font-weight: 600;
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+}
+
+.feature-card p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.feature-icon {
+  padding: 20px;
+  border-radius: 50%;
+  color: white;
+  display: inline-flex;
+  margin-bottom: 15px;
+}
+
+.feature-icon.exhibits {
+  background: linear-gradient(145deg, #4e7dd9 0%, #5e3dd9 100%);
+}
+
+.feature-icon.quizzes {
+  background: linear-gradient(145deg, #d94e7d 0%, #d93d5e 100%);
+}
+
+.feature-icon.games {
+  background: linear-gradient(145deg, #4ed9a6 0%, #3dd991 100%);
+}
+
+.popular-exhibits {
+  background-color: var(--background-secondary);
+  padding: 80px 0;
+}
+
+.popular-exhibits h2 {
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: var(--text-primary);
+}
+
+.popular-exhibits .uk-text-lead {
+  color: var(--text-secondary);
+  max-width: 800px;
+  margin: 0 auto 60px;
+  line-height: 1.6;
+}
+
+.exhibit-card {
+  background-color: var(--card-bg);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.exhibit-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--card-shadow);
+}
+
+.exhibit-card .uk-card-body {
+  padding: 20px;
+}
+
+.exhibit-card h3 {
+  color: var(--text-primary);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.exhibit-card p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* Темная тема */
+.dark-theme .home-section {
+  background-color: var(--background-secondary);
+}
+
+.dark-theme .feature-card {
+  background: var(--card-bg);
+}
+
+.dark-theme .popular-exhibits {
+  background-color: var(--background-secondary);
+}
+
+.dark-theme .exhibit-card {
+  background-color: var(--card-bg);
+}
+
+/* Анимации */
+.fade-up {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.exhibit-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.exhibit-card .uk-card-media-top {
+  height: 200px;
+  overflow: hidden;
+}
+
+.exhibit-card .uk-card-media-top img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.exhibit-card:hover .uk-card-media-top img {
+  transform: scale(1.1);
+}
+
+.exhibit-card .uk-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.exhibit-card .uk-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.exhibit-card p {
+  flex: 1;
+  margin-bottom: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.exhibit-card .uk-card-footer {
+  margin-top: auto;
+  padding: 1rem;
+  border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.exhibit-card .uk-button-text {
+  padding: 0.5rem 0;
+  font-weight: 500;
+}
+
+.exhibit-card .uk-button-text:hover {
+  color: #1e87f0;
+} 

@@ -1,0 +1,135 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--background-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  transition: background-color 0.3s ease;
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.logo svg {
+  width: 24px;
+  height: 24px;
+  color: var(--accent-color);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: var(--text-primary);
+  font-weight: 500;
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--accent-color);
+  transition: width 0.2s ease;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.nav-link.active {
+  color: var(--accent-color);
+}
+
+.nav-link.active::after {
+  width: 100%;
+}
+
+/* Добавляем отступ для контента под фиксированным header */
+main {
+  padding-top: 80px;
+}
+
+/* High contrast overrides for light mode */
+:root:not(.dark-theme) .header {
+  background: linear-gradient(to right, #f9fafb, #ffffff);
+  border-bottom: 1px solid #e5e7eb;
+}
+
+:root:not(.dark-theme) .logo {
+  color: #1e3a8a; /* Darker blue for better contrast */
+}
+
+:root:not(.dark-theme) .nav-link {
+  color: #1e3a8a; /* Darker blue for better contrast */
+  font-weight: 600;
+}
+
+:root:not(.dark-theme) .nav-link:hover,
+:root:not(.dark-theme) .nav-link.active {
+  color: #2563eb; /* Bright blue for active/hover state */
+}
+
+/* Dark theme adjustments */
+.dark-theme .header {
+  background-color: var(--header-bg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.dark-theme .logo {
+  color: var(--header-text-color);
+}
+
+.dark-theme .nav-link {
+  color: var(--header-text-color);
+}
+
+.dark-theme .nav-link:hover,
+.dark-theme .nav-link.active {
+  color: var(--header-link-hover);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .header-container {
+    padding: 0.75rem 1rem;
+  }
+  
+  .logo {
+    font-size: 1.25rem;
+  }
+  
+  .nav-links {
+    gap: 1.5rem;
+  }
+  
+  .nav-link {
+    font-size: 0.875rem;
+  }
+} 

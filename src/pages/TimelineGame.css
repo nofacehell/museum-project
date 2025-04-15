@@ -1,0 +1,196 @@
+.timeline-game-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.timeline-game-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.timeline-game-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.timeline-game-description {
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.timeline-game-stats {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: var(--section-bg);
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+.stat-item .uk-icon {
+  margin-right: 0.625rem;
+  color: var(--accent-color);
+}
+
+.timeline-game-button {
+  padding: 0.75rem 1.5rem;
+  background: var(--accent-gradient);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(78, 125, 217, 0.3);
+}
+
+.timeline-game-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(78, 125, 217, 0.4);
+}
+
+.timeline-game-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.timeline-game-button.secondary {
+  background: var(--card-bg);
+  color: var(--text-primary);
+  box-shadow: 0 4px 15px var(--card-shadow);
+}
+
+.timeline-game-button.secondary:hover {
+  box-shadow: 0 6px 20px var(--card-shadow);
+}
+
+.timeline-game-content {
+  background: var(--section-bg);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: var(--card-shadow);
+}
+
+.timeline-game-pieces {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.timeline-game-piece {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--card-shadow);
+}
+
+.timeline-game-piece:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px var(--card-shadow);
+}
+
+.timeline-game-piece.selected {
+  border: 3px solid var(--accent-color);
+}
+
+.timeline-game-piece img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.piece-info {
+  padding: 1rem;
+  background: var(--card-bg);
+}
+
+.piece-info h3 {
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.piece-info p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.check-button {
+  display: block;
+  margin: 0 auto;
+  width: 200px;
+}
+
+.timeline-game-complete {
+  text-align: center;
+  padding: 2rem;
+  background: var(--section-bg);
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+}
+
+.timeline-game-complete h2 {
+  color: var(--text-primary);
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.timeline-game-complete p {
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.timeline-game-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .timeline-game-container {
+    padding: 1rem;
+  }
+
+  .timeline-game-title {
+    font-size: 2rem;
+  }
+
+  .timeline-game-description {
+    font-size: 1rem;
+  }
+
+  .timeline-game-stats {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .timeline-game-pieces {
+    grid-template-columns: 1fr;
+  }
+
+  .timeline-game-piece img {
+    height: 250px;
+  }
+} 

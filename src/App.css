@@ -1,0 +1,39 @@
+/* Add padding to all main content pages */
+body {
+  padding-top: 80px; /* Base padding for the entire body */
+}
+
+.uk-section {
+  padding-top: 100px; /* Add padding to ensure content doesn't go under the header */
+  margin-top: 20px; /* Additional margin for better spacing */
+}
+
+/* Main content container */
+main, .uk-container {
+  padding-top: 20px;
+}
+
+/* Add spacing between navigation menu items */
+.nav-links {
+  gap: 24px; /* Increase spacing between navigation links */
+}
+
+/* Add spacing in category filters */
+.uk-button-group .uk-button {
+  margin-right: 8px !important;
+  margin-bottom: 8px !important;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-top: 60px;
+  }
+  
+  .uk-section {
+    padding-top: 80px;
+  }
+  
+  .nav-links {
+    gap: 15px; /* Slightly less spacing on mobile */
+  }
+}

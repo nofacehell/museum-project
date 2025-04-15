@@ -1,0 +1,243 @@
+/* Основные стили для страницы игр */
+.games-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.games-header {
+  text-align: center;
+  padding: 60px 20px;
+  margin-bottom: 40px;
+  background-color: var(--background-secondary);
+  border-radius: 24px;
+  box-shadow: var(--card-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.games-subtitle {
+  display: inline-block;
+  padding: 8px 16px;
+  background: var(--decorative-light);
+  border-radius: 20px;
+  color: var(--accent-color);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.games-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+.games-description {
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  max-width: 600px;
+  margin: 0 auto 30px;
+  line-height: 1.6;
+}
+
+.games-stats {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.stat-item .uk-icon {
+  color: var(--accent-color);
+}
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  padding: 20px 0;
+}
+
+.game-card {
+  background-color: var(--card-bg);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--card-shadow);
+}
+
+.game-image {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.game-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.game-card:hover .game-image img {
+  transform: scale(1.1);
+}
+
+.game-content {
+  padding: 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-tags {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.game-tags span {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.difficulty-tag {
+  background: var(--decorative-light);
+  color: var(--accent-color);
+}
+
+.category-tag {
+  background: var(--decorative-dark);
+  color: var(--text-secondary);
+}
+
+.game-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+}
+
+.game-description {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 20px;
+  flex: 1;
+}
+
+.game-time {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.game-time .uk-icon {
+  color: var(--accent-color);
+}
+
+.game-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 24px;
+  background: var(--accent-gradient);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.game-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  color: white;
+  text-decoration: none;
+}
+
+.game-button .uk-icon {
+  margin-left: 5px;
+}
+
+/* Темная тема */
+.dark-theme .games-header {
+  background-color: var(--background-secondary);
+}
+
+.dark-theme .game-card {
+  background-color: var(--card-bg);
+}
+
+.dark-theme .difficulty-tag {
+  background: var(--decorative-dark);
+}
+
+.dark-theme .category-tag {
+  background: var(--decorative-light);
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.game-card {
+  animation: fadeIn 0.6s ease forwards;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .games-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .games-header {
+    padding: 40px 20px;
+  }
+
+  .games-title {
+    font-size: 2rem;
+  }
+
+  .games-description {
+    font-size: 1rem;
+  }
+
+  .games-stats {
+    flex-direction: column;
+    gap: 15px;
+  }
+} 

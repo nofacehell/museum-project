@@ -1,0 +1,2584 @@
+/* Admin Dashboard Styles */
+.admin-dashboard {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f3f4f6;
+}
+
+.admin-header {
+  background: white;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.admin-header nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-logo {
+  color: #1f2937;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-logo:hover {
+  color: #2563eb;
+}
+
+.admin-nav-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.admin-nav-btn {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 6px;
+}
+
+.admin-nav-btn:hover {
+  color: #2563eb;
+  background: #f3f4f6;
+}
+
+.admin-nav-btn.active {
+  color: #2563eb;
+  background: #eff6ff;
+  font-weight: 500;
+}
+
+.admin-content {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.admin-section-title {
+  color: #1f2937;
+  font-size: 1.875rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+}
+
+.admin-footer {
+  background: white;
+  padding: 1rem;
+  text-align: center;
+  color: #6b7280;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Admin Card Styles */
+.admin-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.admin-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.admin-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.admin-card-content {
+  color: #4b5563;
+}
+
+/* Admin Form Styles */
+.admin-form-group {
+  margin-bottom: 1.5rem;
+}
+
+.admin-form-label {
+  display: block;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.admin-form-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.admin-form-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.admin-form-submit {
+  background: #2563eb;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.admin-form-submit:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.admin-form-submit:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Admin Table Styles */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.admin-table th {
+  background: #f9fafb;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 500;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  color: #4b5563;
+}
+
+.admin-table tr:hover {
+  background: #f9fafb;
+}
+
+/* Admin Actions */
+.admin-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.admin-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.admin-btn-primary {
+  background: #2563eb;
+  color: white;
+  border: none;
+}
+
+.admin-btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.admin-btn-secondary {
+  background: white;
+  color: #4b5563;
+  border: 1px solid #d1d5db;
+}
+
+.admin-btn-secondary:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.admin-btn-danger {
+  background: #ef4444;
+  color: white;
+  border: none;
+}
+
+.admin-btn-danger:hover {
+  background: #dc2626;
+}
+
+/* Admin Alerts */
+.admin-alert {
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.admin-alert-success {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #10b981;
+}
+
+.admin-alert-error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #ef4444;
+}
+
+/* Admin Loading States */
+.admin-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.admin-spinner {
+  border: 3px solid #f3f4f6;
+  border-top: 3px solid #2563eb;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.uk-subnav-pill > * > :first-child {
+  padding: 10px 20px;
+  background: #f8f8f8;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.uk-subnav-pill > .uk-active > a {
+  background: #1e87f0;
+  color: white;
+}
+
+.uk-subnav-pill > * > a:hover {
+  background: #e5e5e5;
+  text-decoration: none;
+}
+
+.uk-card {
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.uk-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+}
+
+.uk-card-title {
+  color: #333;
+  font-weight: 600;
+}
+
+.uk-button {
+  text-transform: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.uk-button-primary {
+  background: #1e87f0;
+}
+
+.uk-button-primary:hover {
+  background: #0f7ae5;
+}
+
+.uk-button-danger {
+  background: #f0506e;
+}
+
+.uk-button-danger:hover {
+  background: #ee395b;
+}
+
+.uk-badge {
+  padding: 5px 10px;
+  font-size: 0.875rem;
+  border-radius: 15px;
+}
+
+.uk-icon-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f8f8f8;
+  color: #666;
+  transition: all 0.3s ease;
+}
+
+.uk-icon-button:hover {
+  background: #1e87f0;
+  color: white;
+}
+
+.uk-heading-medium {
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.uk-section {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+.uk-section-small {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.uk-navbar-container {
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.uk-navbar-nav > li > a {
+  color: #666;
+  font-weight: 500;
+  text-transform: none;
+  transition: color 0.3s ease;
+}
+
+.uk-navbar-nav > li > a:hover,
+.uk-navbar-nav > li.uk-active > a {
+  color: #1e87f0;
+}
+
+.uk-logo {
+  color: #333;
+  font-weight: 700;
+}
+
+.uk-logo:hover {
+  color: #1e87f0;
+}
+
+.uk-divider-icon {
+  margin: 30px 0;
+}
+
+.uk-list > * > * {
+  color: #666;
+}
+
+footer {
+  background: #f8f8f8;
+  margin-top: 40px;
+}
+
+footer h4 {
+  color: #333;
+  font-weight: 600;
+}
+
+.uk-text-meta {
+  color: #999;
+  font-size: 0.875rem;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.uk-card {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* Темная тема - Admin Dashboard */
+.dark-theme {
+  color-scheme: dark;
+}
+
+.dark-theme body {
+  background-color: #121212;
+  color: #E5E7EB;
+}
+
+/* Основные компоненты админ-панели */
+.dark-theme .admin-dashboard {
+  background-color: #111827;
+  color: #E5E7EB;
+}
+
+.dark-theme .admin-header {
+  background: #1F2937;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid #374151;
+}
+
+.dark-theme .admin-logo {
+  color: #F3F4F6;
+}
+
+.dark-theme .admin-logo:hover {
+  color: #60A5FA;
+}
+
+.dark-theme .admin-nav-btn {
+  color: #9CA3AF;
+}
+
+.dark-theme .admin-nav-btn:hover {
+  color: #60A5FA;
+  background: #1F2937;
+}
+
+.dark-theme .admin-nav-btn.active {
+  color: #60A5FA;
+  background: #282F3E;
+  font-weight: 500;
+}
+
+.dark-theme .admin-content {
+  background-color: #111827;
+}
+
+.dark-theme .admin-section-title {
+  color: #F3F4F6;
+}
+
+.dark-theme .admin-footer {
+  background: #1F2937;
+  color: #9CA3AF;
+  border-top: 1px solid #374151;
+}
+
+/* Админ карточки */
+.dark-theme .admin-card {
+  background: #1F2937;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  color: #E5E7EB;
+  border: 1px solid #374151;
+}
+
+.dark-theme .admin-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+}
+
+.dark-theme .admin-card-title {
+  color: #F3F4F6;
+}
+
+.dark-theme .admin-card-content {
+  color: #D1D5DB;
+}
+
+/* Админ формы */
+.dark-theme .admin-form-label {
+  color: #F3F4F6;
+}
+
+.dark-theme .admin-form-input {
+  background-color: #111827;
+  border: 1px solid #374151;
+  color: #E5E7EB;
+}
+
+.dark-theme .admin-form-input:focus {
+  border-color: #60A5FA;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+}
+
+.dark-theme .admin-form-submit {
+  background: #4F46E5;
+}
+
+.dark-theme .admin-form-submit:hover {
+  background: #4338CA;
+}
+
+.dark-theme .admin-form-submit:disabled {
+  background: #4B5563;
+}
+
+/* Админ таблицы */
+.dark-theme .admin-table {
+  background: #1F2937;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  border: 1px solid #374151;
+}
+
+.dark-theme .admin-table th {
+  background: #111827;
+  color: #F3F4F6;
+  border-bottom: 1px solid #374151;
+}
+
+.dark-theme .admin-table td {
+  border-bottom: 1px solid #374151;
+  color: #D1D5DB;
+}
+
+.dark-theme .admin-table tr:hover {
+  background: #282F3E;
+}
+
+/* Админ кнопки */
+.dark-theme .admin-btn-primary {
+  background: #4F46E5;
+  color: white;
+}
+
+.dark-theme .admin-btn-primary:hover {
+  background: #4338CA;
+}
+
+.dark-theme .admin-btn-secondary {
+  background: #1F2937;
+  color: #D1D5DB;
+  border: 1px solid #374151;
+}
+
+.dark-theme .admin-btn-secondary:hover {
+  background: #282F3E;
+  border-color: #4B5563;
+}
+
+.dark-theme .admin-btn-danger {
+  background: #DC2626;
+}
+
+.dark-theme .admin-btn-danger:hover {
+  background: #B91C1C;
+}
+
+/* Админ предупреждения */
+.dark-theme .admin-alert-success {
+  background: #065F46;
+  color: #A7F3D0;
+  border: 1px solid #10B981;
+}
+
+.dark-theme .admin-alert-error {
+  background: #7F1D1D;
+  color: #FCA5A5;
+  border: 1px solid #DC2626;
+}
+
+/* Админ загрузка */
+.dark-theme .admin-spinner {
+  border: 3px solid #282F3E;
+  border-top: 3px solid #60A5FA;
+}
+
+/* UIkit компоненты */
+.dark-theme .uk-subnav-pill > * > :first-child {
+  background: #1F2937;
+  color: #D1D5DB;
+}
+
+.dark-theme .uk-subnav-pill > .uk-active > a {
+  background: #4F46E5;
+  color: white;
+}
+
+.dark-theme .uk-subnav-pill > * > a:hover {
+  background: #282F3E;
+}
+
+.dark-theme .uk-card {
+  background-color: #1F2937;
+  color: #E5E7EB;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  border: 1px solid #374151;
+}
+
+.dark-theme .uk-card:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.dark-theme .uk-card-title {
+  color: #F3F4F6;
+}
+
+.dark-theme .uk-button-primary {
+  background: #4F46E5;
+}
+
+.dark-theme .uk-button-primary:hover {
+  background: #4338CA;
+}
+
+.dark-theme .uk-button-danger {
+  background: #DC2626;
+}
+
+.dark-theme .uk-button-danger:hover {
+  background: #B91C1C;
+}
+
+.dark-theme .uk-badge {
+  background: #4F46E5;
+}
+
+.dark-theme .uk-icon-button {
+  background: #1F2937;
+  color: #D1D5DB;
+}
+
+.dark-theme .uk-icon-button:hover {
+  background: #4F46E5;
+  color: white;
+}
+
+.dark-theme .uk-heading-medium {
+  color: #F3F4F6;
+}
+
+.dark-theme .uk-navbar-container {
+  background: #1F2937;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .uk-navbar-nav > li > a {
+  color: #D1D5DB;
+}
+
+.dark-theme .uk-navbar-nav > li > a:hover,
+.dark-theme .uk-navbar-nav > li.uk-active > a {
+  color: #60A5FA;
+}
+
+.dark-theme .uk-logo {
+  color: #F3F4F6;
+}
+
+.dark-theme .uk-logo:hover {
+  color: #60A5FA;
+}
+
+.dark-theme .uk-list > * > * {
+  color: #D1D5DB;
+}
+
+.dark-theme footer {
+  background: #111827;
+  color: #9CA3AF;
+  border-top: 1px solid #374151;
+}
+
+.dark-theme footer h4 {
+  color: #F3F4F6;
+}
+
+.dark-theme .uk-text-meta {
+  color: #9CA3AF;
+}
+
+.dark-theme .uk-section-muted {
+  background-color: #111827;
+}
+
+.dark-theme .uk-input, 
+.dark-theme .uk-select, 
+.dark-theme .uk-textarea {
+  background-color: #1F2937;
+  border: 1px solid #374151;
+  color: #E5E7EB;
+}
+
+.dark-theme .uk-input:focus, 
+.dark-theme .uk-select:focus, 
+.dark-theme .uk-textarea:focus {
+  background-color: #1F2937;
+  border-color: #60A5FA;
+  color: #E5E7EB;
+}
+
+.dark-theme .uk-form-label {
+  color: #F3F4F6;
+}
+
+.dark-theme .uk-link,
+.dark-theme a {
+  color: #60A5FA;
+}
+
+.dark-theme .uk-link:hover,
+.dark-theme a:hover {
+  color: #93C5FD;
+}
+
+/* Стили для специфичных компонентов админки */
+.dark-theme .theme-toggle-button {
+  background: linear-gradient(45deg, #8B5CF6, #3B82F6);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.dark-theme .theme-toggle-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+.dark-theme .admin-auth-card {
+  background-color: #1F2937;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+  border: 1px solid #374151;
+}
+
+.dark-theme .admin-card-header {
+  background-image: linear-gradient(145deg, #4F46E5, #6366F1);
+  padding: 30px 20px 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.dark-theme .admin-card-body {
+  background-color: #1F2937;
+  padding: 30px;
+}
+
+.dark-theme .admin-form-icon {
+  color: #8B5CF6;
+  font-size: 24px;
+  margin-bottom: 20px;
+  display: inline-block;
+}
+
+/* Стили для админ панели управления */
+.dark-theme .admin-panel-header {
+  background-color: #1F2937;
+  color: #F3F4F6;
+  border-bottom: 1px solid #374151;
+}
+
+.dark-theme .admin-panel-title {
+  color: #F3F4F6;
+}
+
+.dark-theme .admin-panel-navigation {
+  background-color: #1F2937;
+  border-right: 1px solid #374151;
+}
+
+.dark-theme .admin-panel-content {
+  background-color: #111827;
+}
+
+.dark-theme .admin-tab {
+  color: #9CA3AF;
+}
+
+.dark-theme .admin-tab.active {
+  color: #F3F4F6;
+  border-color: #6366F1;
+}
+
+.dark-theme .admin-tab:hover {
+  color: #E5E7EB;
+}
+
+/* Статусы отзывов */
+.dark-theme .status-badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.dark-theme .status-approved {
+  background-color: rgba(16, 185, 129, 0.2);
+  color: #34D399;
+  border: 1px solid #34D399;
+}
+
+.dark-theme .status-pending {
+  background-color: rgba(245, 158, 11, 0.2);
+  color: #FBBF24;
+  border: 1px solid #FBBF24;
+}
+
+.dark-theme .status-rejected {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #F87171;
+  border: 1px solid #F87171;
+}
+
+/* Изменения для выпадающих списков */
+.dark-theme .uk-select option {
+  background-color: #1F2937;
+  color: #E5E7EB;
+}
+
+/* New styles for the redesigned Admin Dashboard */
+
+/* Dark mode and light mode styles */
+.admin-dashboard.dark-mode {
+  --bg-primary: #111827;
+  --bg-secondary: #1F2937;
+  --text-primary: #F9FAFB;
+  --text-secondary: #D1D5DB;
+  --accent-color: #4F46E5;
+  --accent-hover: #4338CA;
+  --border-color: #374151;
+  --card-bg: #1F2937;
+  --error-color: #EF4444;
+  --success-color: #10B981;
+  --warning-color: #F59E0B;
+}
+
+.admin-dashboard.light-mode {
+  --bg-primary: #F9FAFB;
+  --bg-secondary: #FFFFFF;
+  --text-primary: #1F2937;
+  --text-secondary: #4B5563;
+  --accent-color: #3B82F6;
+  --accent-hover: #2563EB;
+  --border-color: #E5E7EB;
+  --card-bg: #FFFFFF;
+  --error-color: #DC2626;
+  --success-color: #059669;
+  --warning-color: #D97706;
+}
+
+/* Admin Dashboard Base Styles */
+.admin-dashboard {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-header {
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-primary);
+}
+
+.admin-header-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--text-primary);
+}
+
+.admin-header-logo {
+  color: var(--accent-color);
+  background-color: rgba(79, 70, 229, 0.1);
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-header-text h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.admin-header-text p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.admin-header-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.theme-toggle-dashboard {
+  background-color: transparent;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+.theme-toggle-dashboard:hover {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.theme-toggle-dashboard span {
+  transition: transform 0.5s ease;
+}
+
+.logout-button {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--error-color);
+  border-color: var(--error-color);
+}
+
+/* Admin Tabs Navigation */
+.admin-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 24px;
+  background-color: var(--bg-secondary);
+}
+
+.admin-tab {
+  background: none;
+  border: none;
+  padding: 16px 20px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.admin-tab:hover {
+  color: var(--accent-color);
+}
+
+.admin-tab.active {
+  color: var(--accent-color);
+}
+
+.admin-tab.active:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--accent-color);
+}
+
+/* Admin Content */
+.admin-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+/* Admin Card */
+.admin-card {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.admin-card-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-card-title {
+  margin: 0;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.create-btn {
+  background-color: var(--accent-color);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.create-btn:hover {
+  background-color: var(--accent-hover);
+}
+
+/* Admin Table */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 12px 24px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.admin-table th {
+  font-weight: 500;
+  color: var(--text-secondary);
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.admin-table tr:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Difficulty Tags */
+.difficulty-tag {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-block;
+  text-transform: capitalize;
+}
+
+.difficulty-easy {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10B981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.difficulty-medium {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #F59E0B;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.difficulty-hard {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #EF4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.difficulty-unknown {
+  background-color: rgba(107, 114, 128, 0.1);
+  color: #6B7280;
+  border: 1px solid rgba(107, 114, 128, 0.3);
+}
+
+/* Switch Toggle */
+.switch-toggle {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 24px;
+}
+
+.switch-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: var(--accent-color);
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px var(--accent-color);
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px);
+}
+
+/* Action Buttons */
+.action-btn {
+  background-color: transparent;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.action-btn.edit {
+  color: var(--accent-color);
+}
+
+.action-btn.edit:hover {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.action-btn.delete {
+  color: var(--error-color);
+}
+
+.action-btn.delete:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.action-btn.approve {
+  color: var(--success-color);
+}
+
+.action-btn.approve:hover {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.action-btn.reject {
+  color: var(--warning-color);
+}
+
+.action-btn.reject:hover {
+  background-color: rgba(245, 158, 11, 0.1);
+}
+
+/* Loading State */
+.admin-loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 0;
+}
+
+.admin-loader {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--accent-color);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+  text-align: center;
+}
+
+.empty-state-icon {
+  color: var(--border-color);
+  margin-bottom: 16px;
+}
+
+.empty-state-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.empty-state-text {
+  color: var(--text-secondary);
+  max-width: 400px;
+}
+
+/* Review Card */
+.review-card {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.review-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.review-author {
+  font-weight: 600;
+}
+
+.review-rating {
+  display: flex;
+}
+
+.review-text {
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.review-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.review-date {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.review-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.review-images {
+  margin: 12px 0;
+}
+
+.images-title {
+  font-size: 14px;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.image-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.review-image {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.review-image:hover {
+  transform: scale(1.05);
+}
+
+/* Notification Styles for Dark Mode */
+.dark-theme .uk-notification-message {
+  background-color: #1F2937;
+  color: #F3F4F6;
+  border-left: 4px solid #60A5FA;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .uk-notification-message-primary {
+  border-left-color: #60A5FA;
+}
+
+.dark-theme .uk-notification-message-success {
+  border-left-color: #10B981;
+}
+
+.dark-theme .uk-notification-message-warning {
+  border-left-color: #F59E0B;
+}
+
+.dark-theme .uk-notification-message-danger {
+  border-left-color: #EF4444;
+}
+
+/* Focus styles for better accessibility */
+.dark-theme *:focus {
+  outline: 2px solid #60A5FA;
+  outline-offset: 2px;
+}
+
+/* Scrollbar styling for dark mode */
+.dark-theme *::-webkit-scrollbar {
+  width: 14px;
+}
+
+.dark-theme *::-webkit-scrollbar-track {
+  background: #111827;
+}
+
+.dark-theme *::-webkit-scrollbar-thumb {
+  background-color: #4B5563;
+  border-radius: 7px;
+  border: 3px solid #111827;
+}
+
+.dark-theme *::-webkit-scrollbar-thumb:hover {
+  background-color: #60A5FA;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.admin-card, .review-card {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes rotate360 {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Main Navigation for Admin Panel */
+.main-nav {
+  background-color: #1a1a2e;
+  padding: 10px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  position: relative;
+}
+
+.dark-mode .main-nav {
+  background-color: #0f172a;
+  border-bottom: 1px solid #2d3748;
+}
+
+.light-mode .main-nav {
+  background-color: #1e40af;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.main-nav .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links li {
+  margin-right: 20px;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: background-color 0.3s, color 0.3s;
+  display: block;
+}
+
+.light-mode .nav-links a {
+  color: #ffffff;
+  font-weight: 600;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.light-mode .nav-links a:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+/* Make admin dashboard more responsive */
+@media (max-width: 768px) {
+  .admin-header {
+    flex-direction: column;
+    padding: 12px;
+  }
+  
+  .admin-header-title {
+    margin-bottom: 16px;
+  }
+  
+  .admin-tabs {
+    overflow-x: auto;
+    padding: 0 12px;
+  }
+  
+  .admin-tab {
+    padding: 12px;
+    white-space: nowrap;
+  }
+  
+  .nav-links {
+    flex-wrap: wrap;
+  }
+  
+  .nav-links li {
+    margin-bottom: 8px;
+  }
+  
+  .admin-table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+/* Fix scrollbar appearance */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.dark-mode ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.dark-mode ::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Улучшенные стили для навигации в светлой теме */
+.light-mode .main-nav {
+  background-color: #1e40af;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.light-mode .nav-links a {
+  color: #ffffff;
+  font-weight: 600;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.light-mode .nav-links a:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+/* Исправление отображения header для всех тем */
+.admin-header {
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-primary);
+}
+
+.admin-header-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--text-primary);
+}
+
+.admin-header-text h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.admin-header-text p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Fix for navigation visibility in both themes */
+.main-nav {
+  background-color: #1a1a2e;
+  padding: 10px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  position: relative;
+}
+
+.main-nav .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links li {
+  margin-right: 20px;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: background-color 0.3s, color 0.3s;
+  display: block;
+}
+
+/* Fix for light theme text visibility */
+.admin-dashboard.light-mode .main-nav {
+  background-color: #1e40af;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.admin-dashboard.light-mode .nav-links a {
+  color: #ffffff !important;
+  font-weight: 600;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.admin-dashboard.light-mode .admin-header-title h1 {
+  color: #1F2937 !important;
+  font-weight: 600;
+  text-shadow: none;
+}
+
+.admin-dashboard.light-mode .admin-header-title p {
+  color: #4B5563 !important;
+}
+
+.admin-dashboard.light-mode .theme-toggle-dashboard {
+  color: #1F2937;
+}
+
+.admin-dashboard.light-mode .admin-tabs {
+  background-color: #FFFFFF;
+}
+
+.admin-dashboard.light-mode .admin-tab {
+  color: #4B5563;
+}
+
+.admin-dashboard.light-mode .admin-tab.active {
+  color: #3B82F6;
+}
+
+/* Enhanced DOM targeting for admin content */
+#admin-content {
+  display: block !important;
+  visibility: visible !important;
+  position: fixed !important;
+  inset: 0px !important;
+  z-index: 9999 !important;
+  overflow: auto !important;
+}
+
+.dark-mode #admin-content {
+  background-color: #111827 !important;
+}
+
+.light-mode #admin-content {
+  background-color: #F9FAFB !important;
+}
+
+/* Critical override to ensure visibility */
+body.light-theme .admin-dashboard .main-nav,
+body .admin-dashboard.light-mode .main-nav {
+  background-color: #1e40af !important;
+}
+
+body.light-theme .admin-dashboard .nav-links a,
+body .admin-dashboard.light-mode .nav-links a {
+  color: #ffffff !important;
+}
+
+/* Стили для админ-панели */
+#root {
+  position: relative;
+}
+
+/* Принудительная видимость админ-панели */
+.admin-dashboard {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999 !important;
+  overflow: auto !important;
+  visibility: visible !important;
+  background-color: #f9fafb;
+  color: #111827;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 20px !important;
+}
+
+/* Стили для темной темы */
+.admin-dashboard.dark-mode {
+  background-color: #111827 !important;
+  color: #f9fafb !important;
+}
+
+/* Стили для кнопок в темной теме */
+.admin-dashboard.dark-mode button {
+  color: #f9fafb !important;
+}
+
+/* Стили для таблиц в темной теме */
+.admin-dashboard.dark-mode .uk-table {
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+}
+
+/* Стили для карточек в темной теме */
+.admin-dashboard.dark-mode .uk-card {
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+}
+
+/* Стили для навигации */
+.admin-dashboard .uk-tab {
+  border-bottom-color: #d1d5db;
+}
+
+.admin-dashboard.dark-mode .uk-tab {
+  border-bottom-color: #374151;
+}
+
+/* Активная вкладка в навигации */
+.admin-dashboard .uk-tab > .uk-active > a {
+  color: #2563eb;
+  border-color: #2563eb;
+}
+
+.admin-dashboard.dark-mode .uk-tab > .uk-active > a {
+  color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+/* Стили для спиннера загрузки */
+.admin-dashboard .uk-spinner {
+  color: #2563eb;
+}
+
+.admin-dashboard.dark-mode .uk-spinner {
+  color: #3b82f6;
+}
+
+/* Стили для уведомлений */
+.admin-dashboard .uk-notification-message {
+  background-color: #ffffff;
+  color: #111827;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.admin-dashboard.dark-mode .uk-notification-message {
+  background-color: #1f2937;
+  color: #f9fafb;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+/* Стили для форм */
+.admin-dashboard input,
+.admin-dashboard select,
+.admin-dashboard textarea {
+  background-color: #ffffff;
+  color: #111827;
+  border: 1px solid #d1d5db;
+}
+
+.admin-dashboard.dark-mode input,
+.admin-dashboard.dark-mode select,
+.admin-dashboard.dark-mode textarea {
+  background-color: #374151;
+  color: #f9fafb;
+  border: 1px solid #4b5563;
+}
+
+/* Переопределение стилей UIkit для темной темы */
+.admin-dashboard.dark-mode .uk-button-default {
+  background-color: #374151;
+  color: #f9fafb;
+  border: 1px solid #4b5563;
+}
+
+.admin-dashboard.dark-mode .uk-button-primary {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+
+.admin-dashboard.dark-mode .uk-button-danger {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+/* Стили для футера */
+.admin-dashboard .footer {
+  margin-top: auto;
+  padding: 15px;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  text-align: center;
+  border-radius: 8px;
+}
+
+.admin-dashboard.dark-mode .footer {
+  background-color: #1f2937;
+  color: #9ca3af;
+}
+
+/* Скрыть элементы основного сайта при отображении админ-панели */
+.admin-dashboard ~ header,
+.admin-dashboard ~ footer,
+.admin-dashboard ~ main {
+  display: none !important;
+}
+
+/* Стиль для устранения проблем с отображением */
+body {
+  overflow: auto !important;
+}
+
+/* Стили для предотвращения конфликтов */
+.uk-offcanvas-content {
+  overflow: initial;
+}
+
+/* Тема переключатель */
+.theme-toggle-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.admin-dashboard.dark-mode .theme-toggle-button {
+  color: #f9fafb;
+}
+
+/* Анимация переключателя темы */
+.theme-toggle-button.rotating {
+  transform: rotate(360deg);
+}
+
+/* Стили для уведомлений в админ-панели */
+.uk-notification-message-primary {
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
+}
+
+.uk-notification-message-success {
+  background-color: #dcfce7 !important;
+  color: #166534 !important;
+}
+
+.uk-notification-message-warning {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+}
+
+.uk-notification-message-danger {
+  background-color: #fee2e2 !important;
+  color: #b91c1c !important;
+}
+
+.admin-dashboard.dark-mode .uk-notification-message-primary {
+  background-color: #1e40af !important;
+  color: #dbeafe !important;
+}
+
+.admin-dashboard.dark-mode .uk-notification-message-success {
+  background-color: #166534 !important;
+  color: #dcfce7 !important;
+}
+
+.admin-dashboard.dark-mode .uk-notification-message-warning {
+  background-color: #92400e !important;
+  color: #fef3c7 !important;
+}
+
+.admin-dashboard.dark-mode .uk-notification-message-danger {
+  background-color: #b91c1c !important;
+  color: #fee2e2 !important;
+}
+
+/* Основные стили для админ-панели - улучшенная версия */
+
+/* Переменные для тем */
+:root {
+  --admin-primary: #4f46e5;
+  --admin-primary-dark: #4338ca;
+  --admin-primary-light: #6366f1;
+  --admin-secondary: #64748b;
+  --admin-success: #10b981;
+  --admin-danger: #ef4444;
+  --admin-warning: #f59e0b;
+  
+  --admin-font-primary: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --admin-font-secondary: 'Montserrat', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* Стили для темного режима */
+html.dark-theme {
+  --admin-bg: #0f172a;
+  --admin-text: #f1f5f9;
+  --admin-card-bg: #1e293b;
+  --admin-card-border: #334155;
+  --admin-header-bg: #1e293b;
+  --admin-header-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --admin-button-primary: var(--admin-primary-light);
+  --admin-button-secondary: #475569;
+  --admin-button-danger: #ef4444;
+  --admin-stats-bg: #334155;
+  --admin-stats-text: #cbd5e1;
+  --admin-stats-value: #60a5fa;
+  --admin-table-header: #334155;
+  --admin-table-border: #475569;
+  --admin-table-hover: #1e283a;
+  --admin-shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.2);
+  --admin-shadow-md: 0 4px 10px rgba(0, 0, 0, 0.3);
+  --admin-shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.4);
+  --admin-sidebar-bg: #0f172a;
+  --admin-sidebar-hover: #1e293b;
+  --admin-form-bg: #293548;
+  --admin-form-border: #475569;
+  --admin-modal-bg: rgba(0, 0, 0, 0.7);
+}
+
+/* Стили для светлого режима */
+html:not(.dark-theme) {
+  --admin-bg: #f8fafc;
+  --admin-text: #334155;
+  --admin-card-bg: #ffffff;
+  --admin-card-border: #e2e8f0;
+  --admin-header-bg: #ffffff;
+  --admin-header-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --admin-button-primary: var(--admin-primary);
+  --admin-button-secondary: #e2e8f0;
+  --admin-button-danger: #dc2626;
+  --admin-stats-bg: #f8fafc;
+  --admin-stats-text: #64748b;
+  --admin-stats-value: #3b82f6;
+  --admin-table-header: #f8fafc;
+  --admin-table-border: #e2e8f0;
+  --admin-table-hover: #f1f5f9;
+  --admin-shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.05);
+  --admin-shadow-md: 0 4px 10px rgba(0, 0, 0, 0.08);
+  --admin-shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.12);
+  --admin-sidebar-bg: #f1f5f9;
+  --admin-sidebar-hover: #e2e8f0;
+  --admin-form-bg: #f8fafc;
+  --admin-form-border: #e2e8f0;
+  --admin-modal-bg: rgba(0, 0, 0, 0.5);
+}
+
+/* Управление скрытыми основными элементами страницы */
+body.admin-mode header,
+body.admin-mode footer,
+body.admin-mode main:not(#admin-main) {
+  display: none !important;
+}
+
+/* Обеспечиваем полное отображение админ-панели */
+#admin-dashboard {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 10000 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background-color: var(--admin-bg) !important;
+  color: var(--admin-text) !important;
+  font-family: var(--admin-font-primary) !important;
+}
+
+/* Стили для шапки админ-панели - улучшенная версия */
+#admin-dashboard header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 0.75rem 1.5rem !important;
+  background-color: var(--admin-header-bg) !important;
+  border-bottom: 1px solid var(--admin-card-border) !important;
+  box-shadow: var(--admin-header-shadow) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1000 !important;
+  height: 70px !important;
+}
+
+/* Основной контент */
+#admin-main {
+  flex: 1 !important;
+  padding: 1.5rem !important;
+  overflow-y: auto !important;
+  background-color: var(--admin-bg) !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--admin-secondary) var(--admin-bg) !important;
+}
+
+#admin-main::-webkit-scrollbar {
+  width: 6px !important;
+}
+
+#admin-main::-webkit-scrollbar-track {
+  background: var(--admin-bg) !important;
+}
+
+#admin-main::-webkit-scrollbar-thumb {
+  background-color: var(--admin-secondary) !important;
+  border-radius: 6px !important;
+}
+
+/* Стилизация карточек и контейнеров */
+.admin-card {
+  background-color: var(--admin-card-bg) !important;
+  border-radius: 10px !important;
+  box-shadow: var(--admin-shadow-md) !important;
+  padding: 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+  border: 1px solid var(--admin-card-border) !important;
+  transition: box-shadow 0.3s ease, transform 0.2s ease !important;
+  overflow: hidden !important;
+}
+
+.admin-card:hover {
+  box-shadow: var(--admin-shadow-lg) !important;
+}
+
+/* Заголовки */
+.admin-title {
+  font-size: 1.75rem !important;
+  font-weight: 700 !important;
+  color: var(--admin-text) !important;
+  margin-bottom: 1.5rem !important;
+  letter-spacing: -0.5px !important;
+  position: relative !important;
+}
+
+.admin-title:after {
+  content: "" !important;
+  position: absolute !important;
+  bottom: -8px !important;
+  left: 0 !important;
+  width: 50px !important;
+  height: 3px !important;
+  background: var(--admin-primary) !important;
+  border-radius: 2px !important;
+}
+
+.admin-subtitle {
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  color: var(--admin-text) !important;
+  margin-bottom: 1rem !important;
+}
+
+/* Кнопки */
+.admin-btn {
+  padding: 0.5rem 1rem !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  border: none !important;
+}
+
+.admin-btn-primary {
+  background-color: var(--admin-button-primary) !important;
+  color: white !important;
+}
+
+.admin-btn-primary:hover {
+  background-color: var(--admin-primary-dark) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(79, 70, 229, 0.4) !important;
+}
+
+.admin-btn-secondary {
+  background-color: var(--admin-button-secondary) !important;
+  color: var(--admin-text) !important;
+}
+
+.admin-btn-secondary:hover {
+  background-color: var(--admin-card-border) !important;
+  transform: translateY(-1px) !important;
+}
+
+.admin-btn-danger {
+  background-color: var(--admin-button-danger) !important;
+  color: white !important;
+}
+
+.admin-btn-danger:hover {
+  background-color: #b91c1c !important;
+  transform: translateY(-1px) !important;
+}
+
+.admin-btn-success {
+  background-color: var(--admin-success) !important;
+  color: white !important;
+  box-shadow: 0 2px 5px rgba(16, 185, 129, 0.3) !important;
+}
+
+.admin-btn-success:hover {
+  background-color: #059669 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4) !important;
+}
+
+/* Иконки внутри кнопок */
+.admin-btn svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+/* Таблицы */
+.admin-table {
+  width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  margin-bottom: 1.5rem !important;
+  overflow: hidden !important;
+  border-radius: 10px !important;
+  box-shadow: var(--admin-shadow-sm) !important;
+}
+
+.admin-table th {
+  background-color: var(--admin-table-header) !important;
+  color: var(--admin-text) !important;
+  font-weight: 600 !important;
+  text-align: left !important;
+  padding: 1rem !important;
+  border-bottom: 2px solid var(--admin-table-border) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+}
+
+.admin-table th:first-child {
+  border-top-left-radius: 10px !important;
+}
+
+.admin-table th:last-child {
+  border-top-right-radius: 10px !important;
+}
+
+.admin-table td {
+  padding: 0.875rem 1rem !important;
+  border-bottom: 1px solid var(--admin-table-border) !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.admin-table tr {
+  background-color: var(--admin-card-bg) !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.admin-table tr:hover {
+  background-color: var(--admin-table-hover) !important;
+}
+
+.admin-table tr:last-child td:first-child {
+  border-bottom-left-radius: 10px !important;
+}
+
+.admin-table tr:last-child td:last-child {
+  border-bottom-right-radius: 10px !important;
+}
+
+.admin-table-actions {
+  display: flex !important;
+  gap: 0.5rem !important;
+  justify-content: flex-end !important;
+}
+
+/* Модальные окна */
+.admin-modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background-color: var(--admin-modal-bg) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 2000 !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transition: opacity 0.3s ease, visibility 0.3s ease !important;
+}
+
+.admin-modal-overlay.active {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.admin-modal {
+  background-color: var(--admin-card-bg) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--admin-shadow-lg) !important;
+  width: 100% !important;
+  max-width: 600px !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  position: relative !important;
+  transform: translateY(20px) !important;
+  opacity: 0 !important;
+  transition: transform 0.3s ease, opacity 0.3s ease !important;
+}
+
+.admin-modal.active {
+  transform: translateY(0) !important;
+  opacity: 1 !important;
+}
+
+.admin-modal-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 1.25rem !important;
+  border-bottom: 1px solid var(--admin-card-border) !important;
+}
+
+.admin-modal-title {
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  color: var(--admin-text) !important;
+  margin: 0 !important;
+}
+
+.admin-modal-close {
+  background: transparent !important;
+  border: none !important;
+  color: var(--admin-secondary) !important;
+  cursor: pointer !important;
+  font-size: 1.5rem !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  transition: color 0.2s ease !important;
+}
+
+.admin-modal-close:hover {
+  color: var(--admin-danger) !important;
+}
+
+.admin-modal-body {
+  padding: 1.5rem !important;
+}
+
+.admin-modal-footer {
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 1rem !important;
+  padding: 1.25rem !important;
+  border-top: 1px solid var(--admin-card-border) !important;
+}
+
+/* Формы */
+.admin-form-group {
+  margin-bottom: 1.25rem !important;
+}
+
+.admin-form-label {
+  display: block !important;
+  margin-bottom: 0.5rem !important;
+  font-weight: 500 !important;
+  color: var(--admin-text) !important;
+  font-size: 0.9rem !important;
+}
+
+.admin-form-control {
+  width: 100% !important;
+  padding: 0.75rem 1rem !important;
+  font-size: 0.95rem !important;
+  line-height: 1.5 !important;
+  color: var(--admin-text) !important;
+  background-color: var(--admin-form-bg) !important;
+  background-clip: padding-box !important;
+  border: 1px solid var(--admin-form-border) !important;
+  border-radius: 6px !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+}
+
+.admin-form-control:focus {
+  border-color: var(--admin-primary) !important;
+  outline: 0 !important;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.25) !important;
+}
+
+.admin-form-control:disabled {
+  background-color: var(--admin-table-header) !important;
+  opacity: 0.65 !important;
+}
+
+.admin-form-select {
+  appearance: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.75rem center !important;
+  background-size: 1rem !important;
+  padding-right: 2.5rem !important;
+}
+
+/* Анимация для кнопки темы */
+.theme-button-rotate {
+  animation: rotate 0.5s ease !important;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg) !important;
+  }
+  to {
+    transform: rotate(360deg) !important;
+  }
+}
+
+/* Контроль z-index элементов */
+#admin-dashboard,
+#admin-dashboard * {
+  z-index: 10000 !important;
+}
+
+/* Стили для контролей профиля в хедере */
+.admin-user-menu {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+}
+
+.admin-user-info {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  padding: 0.5rem 0.75rem !important;
+  border-radius: 6px !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.admin-user-info:hover {
+  background-color: var(--admin-table-hover) !important;
+}
+
+.admin-user-avatar {
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  border-radius: 50% !important;
+  background-color: var(--admin-primary) !important;
+  color: white !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+}
+
+.admin-user-details {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.admin-user-name {
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  color: var(--admin-text) !important;
+}
+
+.admin-user-role {
+  font-size: 0.75rem !important;
+  color: var(--admin-secondary) !important;
+}
+
+/* Круглые кнопки */
+.admin-btn-circle {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Дашборд виджеты */
+.admin-stats-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
+  gap: 1.5rem !important;
+  margin-bottom: 2.5rem !important;
+}
+
+.admin-stat-card {
+  background-color: var(--admin-card-bg) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--admin-shadow-md) !important;
+  padding: 1.25rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  border: 1px solid var(--admin-card-border) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+}
+
+.admin-stat-card:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: var(--admin-shadow-lg) !important;
+}
+
+.admin-stat-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  margin-bottom: 1rem !important;
+}
+
+.admin-stat-title {
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  color: var(--admin-stats-text) !important;
+}
+
+.admin-stat-icon {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: rgba(79, 70, 229, 0.1) !important;
+  color: var(--admin-primary) !important;
+}
+
+.admin-stat-icon.reviews {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+  color: var(--admin-danger) !important;
+}
+
+.admin-stat-icon.games {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+  color: var(--admin-success) !important;
+}
+
+.admin-stat-icon.quizzes {
+  background-color: rgba(245, 158, 11, 0.1) !important;
+  color: var(--admin-warning) !important;
+}
+
+.admin-stat-value {
+  font-size: 2.5rem !important;
+  font-weight: 700 !important;
+  color: var(--admin-text) !important;
+  margin-bottom: 0.5rem !important;
+  line-height: 1 !important;
+}
+
+.admin-stat-description {
+  font-size: 0.875rem !important;
+  color: var(--admin-stats-text) !important;
+}
+
+.admin-stat-trend {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  margin-top: 0.5rem !important;
+}
+
+.admin-stat-trend.up {
+  color: var(--admin-success) !important;
+}
+
+.admin-stat-trend.down {
+  color: var(--admin-danger) !important;
+}
+
+/* Адаптивные стили */
+@media (max-width: 1024px) {
+  .admin-stats-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+  }
+  
+  .admin-user-details {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  #admin-dashboard header {
+    padding: 0.75rem 1rem !important;
+  }
+  
+  #admin-main {
+    padding: 1rem !important;
+  }
+  
+  .admin-stats-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+    gap: 1rem !important;
+  }
+  
+  .admin-title {
+    font-size: 1.5rem !important;
+  }
+  
+  .admin-subtitle {
+    font-size: 1.1rem !important;
+  }
+  
+  .admin-card {
+    padding: 1.25rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-logo span {
+    display: none !important;
+  }
+  
+  .admin-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .admin-table {
+    display: block !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+  }
+  
+  .admin-modal {
+    max-width: 90% !important;
+  }
+} 
