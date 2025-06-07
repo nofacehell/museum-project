@@ -1,215 +1,164 @@
+// src/pages/Quizzes.jsx
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-import { getQuizzes } from '../utils/api';
+import { Link, useNavigate } from 'react-router-dom';
+import { getQuizzes, getCategories } from '@/utils/api';
 import '../styles/quizzes.css';
 
-// Fallback data to use when API is unavailable
-const fallbackQuizzes = [
-  {
-    _id: '1',
-    title: 'История компьютерной техники',
-    description: 'Проверьте свои знания об истории компьютеров, от первых вычислительных машин до современных устройств.',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Apple_Macintosh_Plus_computer.jpg/640px-Apple_Macintosh_Plus_computer.jpg',
-    category: 'История',
-    difficulty: 'Средняя',
-    questionCount: 10,
-    estimatedTime: '15 минут'
-  },
-  {
-    _id: '2',
-    title: 'Знаете ли вы мобильные устройства?',
-    description: 'Тест на знание истории и технических характеристик знаковых мобильных устройств, изменивших мир.',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Nokia_3310_Blue_R7309170_%28retouch%29.png/640px-Nokia_3310_Blue_R7309170_%28retouch%29.png',
-    category: 'Гаджеты',
-    difficulty: 'Легкая', 
-    questionCount: 8,
-    estimatedTime: '10 минут'
-  },
-  {
-    _id: '3',
-    title: 'Эволюция аудиотехники',
-    description: 'От граммофонов до цифровых аудиоплееров — проверьте, насколько хорошо вы знаете историю аудиотехники.',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Walkman_TPS-L2.JPG/640px-Walkman_TPS-L2.JPG',
-    category: 'Аудио',
-    difficulty: 'Сложная',
-    questionCount: 12,
-    estimatedTime: '20 минут'
-  },
-  {
-    _id: '4',
-    title: 'Видеоигры и консоли',
-    description: 'Тест по истории игровых консолей и знаковых видеоигр, от первых аркадных автоматов до современных систем.',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/NES-Console-Set.jpg/640px-NES-Console-Set.jpg',
-    category: 'Игры',
-    difficulty: 'Средняя',
-    questionCount: 15,
-    estimatedTime: '25 минут'
-  }
-];
-
 const Quizzes = () => {
-  const [quizzes, setQuizzes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
-
-  // Load quizzes from API or use fallback data
-  const loadQuizzes = async () => {
-    setLoading(true);
-    try {
-      console.log('Attempting to fetch quizzes from API...');
-      const data = await getQuizzes();
-      console.log('API response:', data);
-      
-      if (data && Array.isArray(data) && data.length > 0) {
-        setQuizzes(data);
-        console.log('Successfully loaded quizzes from API');
-      } else {
-        console.log('API returned empty data, using fallback quizzes');
-        setQuizzes(fallbackQuizzes);
-      }
-    } catch (err) {
-      console.error('Error loading quizzes:', err);
-      setError('Не удалось загрузить данные квизов. Используем локальные данные.');
-      setQuizzes(fallbackQuizzes);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const navigate = useNavigate();
+  const [quizzes,    setQuizzes]    = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [filterCat,  setFilterCat]  = useState('all');
+  const [search,     setSearch]     = useState('');
+  const [loading,    setLoading]    = useState(true);
+  const [error,      setError]      = useState(null);
 
   useEffect(() => {
-    loadQuizzes();
-    AOS.init({
-      duration: 800,
-      once: true,
-      mirror: false
-    });
+    Promise.all([ loadQuizzes(), loadCategories() ])
+      .finally(() => setLoading(false));
   }, []);
 
-  // Get all unique categories for filter dropdown
-  const categories = ['all', ...new Set(quizzes.map(quiz => quiz.category))];
+  async function loadQuizzes() {
+    try {
+      const data = await getQuizzes();
+      setQuizzes(data);
+    } catch (e) {
+      console.error(e);
+      setError('Не удалось загрузить викторины. Попробуйте позже.');
+    }
+  }
 
-  // Filter quizzes based on category and search query
-  const filteredQuizzes = quizzes.filter(quiz => {
-    const matchesCategory = selectedCategory === 'all' || quiz.category === selectedCategory;
-    const matchesSearch = quiz.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         quiz.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
+  async function loadCategories() {
+    try {
+      const data = await getCategories();
+      setCategories(data);
+    } catch (e) {
+      console.warn(e);
+      setCategories([]);
+    }
+  }
+
+  const onCategoryChange = e => setFilterCat(e.target.value);
+  const onSearchChange   = e => setSearch(e.target.value);
+
+  const formatTime = mins => `${mins ?? 10} мин`;
+
+  const filtered = quizzes.filter(q => {
+    const byCat  = filterCat === 'all' || q.category === filterCat;
+    const byText = !search
+      || q.title.toLowerCase().includes(search.toLowerCase())
+      || q.description?.toLowerCase().includes(search.toLowerCase());
+    return byCat && byText;
   });
 
-  // Handle category filter change
-  const handleCategoryChange = (e) => {
-    setSelectedCategory(e.target.value);
-  };
+  if (loading) {
+    return (
+      <div className="uk-text-center uk-margin-large-top">
+        <div uk-spinner="ratio: 2"></div>
+        <p className="uk-margin-small-top">Загрузка викторин...</p>
+      </div>
+    );
+  }
 
-  // Handle search input change
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
+  if (error) {
+    return (
+      <div className="uk-alert-danger" uk-alert="true">
+        <p>{error}</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="quizzes-container uk-container uk-margin-large-top uk-margin-large-bottom">
-      <h1 className="uk-heading-medium uk-text-center uk-margin-medium-bottom" data-aos="fade-up">
-        Квизы по электронике
-      </h1>
-      
-      {error && (
-        <div className="uk-alert uk-alert-warning" data-aos="fade-up">
-          <p>{error}</p>
+    <div className="quizzes-page">
+      {/* Hero-блок */}
+      <div className="quizzes-hero">
+        <div className="hero-content">
+          <div className="hero-text">
+            <h1 className="uk-heading-medium">Проверка знаний</h1>
+            <p className="uk-text-lead">
+              Погрузитесь в увлекательные викторины по истории электроники. 
+              Проверьте свои знания и узнайте новое.
+            </p>
+          </div>
+          <div className="hero-image-container">
+            <img
+              src="/images/quiz-hero.png"
+              alt=""
+              className="hero-image"
+            />
+          </div>
         </div>
-      )}
-      
-      <div className="quiz-filters uk-margin-medium-bottom" data-aos="fade-up">
+      </div>
+
+      {/* Фильтры */}
+      <div className="quiz-filters uk-margin">
         <div className="uk-grid-small" uk-grid="true">
           <div className="uk-width-1-3@s">
-            <select 
-              className="uk-select" 
-              value={selectedCategory}
-              onChange={handleCategoryChange}
+            <select
+              className="uk-select"
+              value={filterCat}
+              onChange={onCategoryChange}
             >
               <option value="all">Все категории</option>
-              {categories
-                .filter(category => category !== 'all')
-                .map(category => (
-                  <option key={category} value={category}>{category}</option>
-                ))
-              }
+              {categories.map(cat => (
+                <option key={cat.id} value={cat.name}>
+                  {cat.name}
+                </option>
+              ))}
             </select>
           </div>
           <div className="uk-width-2-3@s">
             <input
               className="uk-input"
               type="text"
-              placeholder="Поиск квизов..."
-              value={searchQuery}
-              onChange={handleSearchChange}
+              placeholder="Поиск викторин..."
+              value={search}
+              onChange={onSearchChange}
             />
           </div>
         </div>
       </div>
 
-      {loading ? (
-        <div className="uk-text-center uk-margin-large">
-          <div uk-spinner="ratio: 2"></div>
-          <p className="uk-text-muted">Загрузка квизов...</p>
+      {/* Сетка карточек */}
+      {filtered.length === 0 ? (
+        <div className="uk-alert-primary" uk-alert="true">
+          <p>Викторины не найдены.</p>
         </div>
       ) : (
-        <>
-          {filteredQuizzes.length === 0 ? (
-            <div className="uk-alert uk-alert-primary" data-aos="fade-up">
-              <p>По вашему запросу не найдено квизов. Попробуйте изменить параметры поиска.</p>
-            </div>
-          ) : (
-            <div className="uk-grid uk-child-width-1-1 uk-child-width-1-2@s uk-child-width-1-3@m" uk-grid="masonry: true">
-              {filteredQuizzes.map((quiz, index) => (
-                <div key={quiz._id || index} data-aos="fade-up" data-aos-delay={index * 100}>
-                  <div className="quiz-card uk-card uk-card-default">
-                    <div className="quiz-card-image-container">
-                      <img 
-                        className="quiz-card-image" 
-                        src={quiz.image} 
-                        alt={quiz.title}
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg';
-                        }}
-                      />
-                    </div>
-                    <div className="uk-card-body">
-                      <div className="quiz-card-badges">
-                        <span className="uk-label quiz-category-badge">{quiz.category}</span>
-                        <span className="uk-label quiz-difficulty-badge">{quiz.difficulty}</span>
+        <div className="quizzes-grid">
+          {filtered.map(quiz => (
+            <div key={quiz.id} className="quiz-card">
+              <div className="quiz-card-image-container">
+                <img
+                  src={quiz.image || '/images/quiz-placeholder.jpg'}
+                  className="quiz-card-image"
+                  alt={quiz.title}
+                  onError={e => (e.target.src = '/images/quiz-placeholder.jpg')}
+                />
               </div>
+              <div className="quiz-card-body">
                 <h3 className="quiz-card-title">{quiz.title}</h3>
-                <p className="quiz-card-description">{quiz.description}</p>
-                <div className="quiz-card-meta">
-                        <div className="quiz-card-meta-item">
-                          <span uk-icon="icon: question"></span>
-                          <span>{quiz.questionCount} вопросов</span>
-                        </div>
-                        <div className="quiz-card-meta-item">
-                          <span uk-icon="icon: clock"></span>
-                          <span>{quiz.estimatedTime}</span>
-                        </div>
-                      </div>
+                <div className="quiz-card-badges">
+                  <span className="quiz-category-badge">{quiz.category}</span>
+                  <span className="quiz-difficulty-badge">
+                    {quiz.difficulty === 'easy' ? 'Легкий'
+                     : quiz.difficulty === 'hard' ? 'Сложный'
+                     : 'Средний'}
+                  </span>
                 </div>
-                    <div className="uk-card-footer">
-                      <Link 
-                        to={`/quizzes/${quiz._id}`} 
-                        className="uk-button uk-button-primary uk-width-1-1"
+                <p className="quiz-card-description">{quiz.description}</p>
+              </div>
+              <div className="quiz-card-footer">
+                <Link
+                  to={`/quizzes/${quiz.id}`}
+                  className="uk-button uk-button-primary uk-width-1-1"
                 >
-                        Начать квиз
-                      </Link>
+                  Начать викторину
+                </Link>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-          )}
-        </>
+          ))}
+        </div>
       )}
     </div>
   );

@@ -1,6 +1,58 @@
-RewriteEngine On
+# Handle direct file requests - redirect to index.html for SPA routing
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  
+  # Specifically block direct access to App.jsx and similar source files
+  RewriteRule ^src/App\.jsx$ - [F,L]
+  RewriteRule ^src/.*\.jsx$ - [F,L]
+  
+  # Redirect everything not a real file or directory to index.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.*)$ /index.html [L,QSA]
+  
+  # Prevent direct access to source files
+  RewriteRule ^src/.*\.jsx$ - [F]
+</IfModule>
 
-# Перенаправление всех запросов на index.html
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ /index.html [L] 
+# Set proper MIME types
+<IfModule mod_mime.c>
+  AddType application/javascript .js
+  AddType application/json .json
+  AddType text/css .css
+</IfModule>
+
+# Security headers
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set X-XSS-Protection "1; mode=block"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule> 
+  RewriteRule ^src/App\.jsx$ - [F,L]
+  RewriteRule ^src/.*\.jsx$ - [F,L]
+  
+  # Redirect everything not a real file or directory to index.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.*)$ /index.html [L,QSA]
+  
+  # Prevent direct access to source files
+  RewriteRule ^src/.*\.jsx$ - [F]
+</IfModule>
+
+# Set proper MIME types
+<IfModule mod_mime.c>
+  AddType application/javascript .js
+  AddType application/json .json
+  AddType text/css .css
+</IfModule>
+
+# Security headers
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set X-XSS-Protection "1; mode=block"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule> 

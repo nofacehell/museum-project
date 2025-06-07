@@ -269,7 +269,7 @@ const createStyles = (isDark = false) => ({
     borderRadius: '8px',
     cursor: 'pointer'
   },
-  reviewImage: {
+  reviewImageFullSize: {
     width: '100%',
     height: '100%',
     objectFit: 'cover',
@@ -386,6 +386,7 @@ const Reviews = () => {
     text: '', 
     rating: 5,
     images: [],
+    email: '',
   });
   const [loading, setLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false);
@@ -658,28 +659,39 @@ const Reviews = () => {
     setError(null);
     
     try {
-      // Ensure images are properly formatted
-      const formattedImages = newReview.images.filter(img => 
-        typeof img === 'string' && 
-        img.trim() !== '' && 
-        (img.startsWith('data:image') || img.startsWith('http'))
-      );
+      // Create FormData object
+      const formData = new FormData();
       
-      // Создаем объект отзыва для отправки на сервер
-      const reviewData = {
-        name: newReview.name,
-        comment: newReview.text,
-        rating: parseInt(newReview.rating),
-        images: formattedImages
-      };
+      // Добавляем текстовые поля
+      formData.append('name', newReview.name);
+      formData.append('comment', newReview.text);
+      formData.append('rating', newReview.rating);
+      formData.append('email', newReview.email || `visitor_${Date.now()}@example.com`);
       
-      console.log('Submitting review with formatted images:', {
-        ...reviewData,
-        images: `${formattedImages.length} images`
+      // Добавляем изображения
+      if (newReview.images && newReview.images.length > 0) {
+        for (let i = 0; i < newReview.images.length; i++) {
+          const image = newReview.images[i];
+          if (image.startsWith('data:image')) {
+            // Конвертируем base64 в Blob
+            const response = await fetch(image);
+            const blob = await response.blob();
+            formData.append('images', blob, `image${i}.jpg`);
+          }
+        }
+      }
+      
+      console.log('Submitting review with FormData');
+      console.log('FormData contents:', {
+        name: formData.get('name'),
+        comment: formData.get('comment'),
+        rating: formData.get('rating'),
+        email: formData.get('email'),
+        images: formData.getAll('images')
       });
       
       // Отправляем отзыв через API
-      const response = await createReview(reviewData);
+      const response = await createReview(formData);
       console.log('API response for review creation:', response);
       
       // Извлекаем данные отзыва из ответа API
@@ -691,21 +703,19 @@ const Reviews = () => {
         name: newReview.name,
         text: newReview.text,
         rating: parseInt(newReview.rating),
-        images: formattedImages,
+        images: createdReview.images || [],
         date: new Date().toISOString(),
-        approved: false
+        approved: false,
+        status: 'pending'
       };
       
-      console.log('Adding review to local state:', {
-        ...newReviewObject,
-        images: `${formattedImages.length} images`
-      });
+      console.log('Adding review to local state:', newReviewObject);
       
       // Добавляем отзыв в локальное состояние
       setReviews(prev => [newReviewObject, ...prev]);
       
       // Сбрасываем форму
-      setNewReview({ name: '', text: '', rating: 5, images: [] });
+      setNewReview({ name: '', text: '', rating: 5, images: [], email: '' });
       
       // Показываем уведомление пользователю
       alert('Спасибо за ваш отзыв! Он будет опубликован после проверки администратором.');
@@ -818,13 +828,34 @@ const Reviews = () => {
   };
 
   const openImageModal = (images, index) => {
-    setSelectedImages(images);
+    // Преобразуем все пути к изображениям
+    const processedImages = images.map(image => getImageUrl(image));
+    setSelectedImages(processedImages);
     setCurrentImageIndex(index);
     setShowImageModal(true);
   };
 
   const closeImageModal = () => {
     setShowImageModal(false);
+  };
+
+  const getImageUrl = (image) => {
+    if (!image) return '';
+    if (image.startsWith('http')) return image;
+    if (image.startsWith('data:image')) return image;
+    
+    // Если путь уже содержит /api/uploads, используем его как есть
+    if (image.startsWith('/api/uploads/')) {
+      return image;
+    }
+    
+    // Если путь содержит /uploads, добавляем /api
+    if (image.startsWith('/uploads/')) {
+      return `/api${image}`;
+    }
+    
+    // Для случаев когда приходит только имя файла
+    return `/api/uploads/reviews/${image}`;
   };
 
   if (loading) {
@@ -925,14 +956,30 @@ const Reviews = () => {
               <div className="form-group">
                 <label htmlFor="name">Ваше имя</label>
                 <input
-                  id="name"
                   type="text"
+                  id="name"
                   name="name"
                   value={newReview.name}
                   onChange={handleInputChange}
                   required
+                  className="form-control"
                 />
               </div>
+
+              <div className="form-group">
+                <label htmlFor="email">Ваш email</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={newReview.email}
+                  onChange={handleInputChange}
+                  required
+                  className="form-control"
+                  placeholder="example@domain.com"
+                />
+              </div>
+
               <div className="form-group">
                 <label htmlFor="text">Ваш отзыв</label>
                 <textarea
@@ -1044,64 +1091,79 @@ const Reviews = () => {
               <p>Будьте первыми, кто оставит отзыв о нашем музее!</p>
             </div>
           ) : (
-          <div className="uk-grid uk-child-width-1-2@m uk-grid-match uk-grid-medium" data-uk-grid>
-            {reviews
+            <div style={{ 
+              display: 'flex', 
+              flexWrap: 'wrap', 
+              gap: '20px',
+              justifyContent: 'center',
+              margin: '0 -10px',
+              maxWidth: '1400px',
+              margin: '0 auto'
+            }}>
+              {reviews
                 .filter(review => review.status === 'approved')
                 .map(review => {
                   const images = formatReviewImages(review);
                   return (
-              <div key={review.id} data-aos="fade-up">
-                <div className="review-card">
-                  {/* Декоративный элемент для карточки */}
-                  <div className={`review-card-decoration ${review.rating >= 4 ? 'high-rating' : 'low-rating'}`}></div>
-                  
-                  <div className="review-card-header">
-                    <div className="uk-flex uk-flex-between uk-flex-middle">
-                      <h4 className="review-author">{review.name}</h4>
-                      <div className="review-meta">
-                        <div className="stars">
-                          {renderStars(review.rating, review.id)}
-                        </div>
+                    <div 
+                      key={review.id} 
+                      data-aos="fade-up"
+                      style={{
+                        flex: '0 0 calc(33.333% - 20px)',
+                        width: 'calc(33.333% - 20px)',
+                        minWidth: '400px',
+                        maxWidth: '450px',
+                        margin: '0 10px'
+                      }}
+                    >
+                      <div className="review-card" style={{ height: '100%', padding: '20px' }}>
+                        <div className={`review-card-decoration ${review.rating >= 4 ? 'high-rating' : 'low-rating'}`}></div>
+                        
+                        <div className="review-card-header">
+                          <div className="uk-flex uk-flex-between uk-flex-middle">
+                            <h4 className="review-author">{review.name}</h4>
+                            <div className="review-meta">
+                              <div className="stars">
+                                {renderStars(review.rating, review.id)}
+                              </div>
                               <span className="review-date">
                                 {new Date(review.date || review.createdAt).toLocaleDateString()}
                               </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="review-card-body">
-                          <p className="review-text">{review.comment || review.text}</p>
-                    
-                          {images.length > 0 && (
-                      <div className="review-images">
-                        <div className="image-grid">
-                          {images.map((image, index) => (
-                            <div key={index} className="image-container">
-                              <img 
-                                src={image} 
-                                alt={`Фото ${index + 1} от ${review.name}`}
-                                className="review-image"
-                                onClick={() => openImageModal(images, index)}
-                                style={{ cursor: 'pointer' }}
-                              />
-                              {index === 0 && images.length > 1 && (
-                                <div className="image-counter">
-                                  +{images.length - 1}
-                                </div>
-                              )}
                             </div>
-                          ))}
+                          </div>
+                        </div>
+                        <div className="review-card-body">
+                          <p className="review-text">{review.comment || review.text}</p>
+                          
+                          {images.length > 0 && (
+                            <div className="image-grid">
+                              {images.map((image, index) => (
+                                <div key={index} className="image-container">
+                                  <img 
+                                    src={getImageUrl(image)} 
+                                    alt={`Фото ${index + 1} от ${review.name}`}
+                                    className="review-image"
+                                    onClick={() => openImageModal(images, index)}
+                                    style={{ cursor: 'pointer' }}
+                                  />
+                                  {index === 0 && images.length > 1 && (
+                                    <div className="image-counter">
+                                      +{images.length - 1}
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+                    </div>
                   );
                 })}
             </div>
           )}
         </div>
-          </div>
+      </div>
           
       {/* Модальное окно для просмотра изображений */}
       {showImageModal && selectedImages.length > 0 && (
@@ -1152,7 +1214,7 @@ const Reviews = () => {
             </button>
             
             <img
-              src={selectedImages[currentImageIndex]}
+              src={getImageUrl(selectedImages[currentImageIndex])}
               alt={`Фото ${currentImageIndex + 1}`}
               style={{
                 maxWidth: '100%',

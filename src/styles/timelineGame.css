@@ -1,0 +1,295 @@
+/* Intro Screen */
+.timeline-game-intro {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.timeline-game-intro-content {
+  max-width: 800px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  padding: 3rem;
+  color: white;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.intro-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.intro-icon {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+  color: #60A5FA;
+}
+
+.intro-description {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 1rem 0 2rem;
+  line-height: 1.6;
+}
+
+.game-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.info-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-5px);
+}
+
+.info-icon {
+  font-size: 2rem;
+  color: #60A5FA;
+  margin-bottom: 1rem;
+}
+
+.info-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.info-card p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+}
+
+/* Main Game Container */
+.timeline-game-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+  padding: 2rem;
+  color: white;
+}
+
+.timeline-game-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  transition: color 0.3s ease;
+}
+
+.back-button:hover {
+  color: white;
+}
+
+.game-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  font-size: 1.1rem;
+}
+
+/* Timeline Pieces */
+.timeline-game-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.timeline-pieces {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.timeline-piece {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.timeline-piece:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.timeline-piece.selected {
+  border: 3px solid #60A5FA;
+  transform: translateY(-5px);
+}
+
+.piece-image {
+  position: relative;
+  width: 100%;
+  height: 200px;
+}
+
+.piece-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.piece-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7));
+  display: flex;
+  align-items: flex-end;
+  padding: 1.5rem;
+}
+
+.piece-year {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.piece-info {
+  padding: 1.5rem;
+}
+
+.piece-info h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.piece-info p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Buttons */
+.start-game-button,
+.check-button,
+.game-button {
+  background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.start-game-button:hover,
+.check-button:hover,
+.game-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.game-button.secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.game-button.secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Game Complete Screen */
+.timeline-game-complete {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: white;
+  text-align: center;
+}
+
+.timeline-game-complete h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.timeline-game-complete p {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 2rem;
+}
+
+.timeline-game-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.timeline-game-actions .game-button {
+  width: auto;
+  min-width: 200px;
+}
+
+@media (max-width: 768px) {
+  .timeline-game-intro-content {
+    padding: 2rem;
+  }
+
+  .game-info-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .timeline-pieces {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-item {
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .piece-year {
+    font-size: 1.5rem;
+  }
+
+  .timeline-game-complete h2 {
+    font-size: 2rem;
+  }
+} 

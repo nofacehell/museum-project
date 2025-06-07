@@ -109,11 +109,7 @@ const AdminLogin = () => {
         </div>
       </div>
       
-      <div style={styles.helpText}>
-        <p>Для демонстрации используйте:</p>
-        <p><strong>Логин:</strong> admin</p>
-        <p><strong>Пароль:</strong> admin123</p>
-      </div>
+
     </div>
   );
 };

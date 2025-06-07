@@ -1,0 +1,158 @@
+/* Основные стили футера */
+.footer {
+  position: relative;
+  background-color: var(--footer-bg, #f5f5f7);
+  color: var(--footer-text, #6e6e73);
+  margin-top: auto;
+  font-size: 0.8rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Новый простой футер */
+.footer-simple {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.7rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Копирайт */
+.footer-copyright {
+  color: var(--footer-text, #6e6e73);
+  white-space: nowrap;
+  margin-right: 1rem;
+}
+
+/* Ссылки в футере */
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.footer-links a {
+  color: var(--footer-text, #6e6e73);
+  text-decoration: none;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+}
+
+.footer-links a:hover {
+  color: var(--primary, #3b82f6);
+}
+
+.footer-links a svg {
+  font-size: 0.8rem;
+}
+
+/* Контакт */
+.footer-contact {
+  white-space: nowrap;
+  margin-left: 1rem;
+}
+
+.footer-contact a {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--footer-text, #6e6e73);
+  text-decoration: none;
+  transition: color 0.2s ease;
+  font-size: 0.75rem;
+}
+
+.footer-contact a:hover {
+  color: var(--primary, #3b82f6);
+}
+
+.footer-contact svg {
+  font-size: 0.8rem;
+}
+
+/* Кнопка "Наверх" */
+.scroll-top {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  width: 30px;
+  height: 30px;
+  background-color: var(--primary, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  z-index: 99;
+  font-size: 0.8rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.scroll-top:hover {
+  background-color: var(--primary-dark, #2563eb);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .footer-simple {
+    padding: 0.6rem 1rem;
+  }
+  
+  .footer-links {
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .footer-simple {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.7rem;
+    text-align: center;
+  }
+  
+  .footer-links {
+    order: 1;
+    margin-bottom: 0.3rem;
+  }
+  
+  .footer-copyright {
+    order: 3;
+    margin-right: 0;
+  }
+  
+  .footer-contact {
+    order: 2;
+    margin-bottom: 0.3rem;
+    margin-left: 0;
+  }
+  
+  .scroll-top {
+    width: 25px;
+    height: 25px;
+    bottom: 10px;
+    right: 10px;
+    font-size: 0.7rem;
+  }
+}
+
+/* Цветовые темы */
+:root {
+  --footer-bg: #f5f5f7;
+  --footer-text: #6e6e73;
+  --primary: #3b82f6;
+  --primary-dark: #2563eb;
+}
+
+.dark-theme {
+  --footer-bg: #111827;
+  --footer-text: #f9fafb;
+  --primary: #60a5fa;
+  --primary-dark: #3b82f6;
+} 

@@ -1,0 +1,256 @@
+.puzzle-game {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  padding: 2rem;
+  color: white;
+}
+
+.game-header {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.game-stats {
+  display: flex;
+  gap: 1rem;
+}
+
+.stat-badge {
+  background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.game-controls {
+  display: flex;
+  gap: 1rem;
+}
+
+.control-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.control-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.control-button.exit {
+  background: rgba(220, 53, 69, 0.1);
+  border-color: rgba(220, 53, 69, 0.2);
+}
+
+.control-button.exit:hover {
+  background: rgba(220, 53, 69, 0.2);
+}
+
+.game-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.components-section,
+.assembly-section {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+h3 {
+  color: white;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.components-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.component-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.5rem;
+  cursor: move;
+  transition: all 0.3s ease;
+}
+
+.component-item:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.component-item img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.assembly-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.assembly-slot {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.assembly-slot.filled {
+  border-style: solid;
+  border-color: rgba(0, 180, 219, 0.5);
+  background: rgba(0, 180, 219, 0.1);
+}
+
+.assembly-slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.slot-number {
+  font-size: 2rem;
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: bold;
+}
+
+.puzzle-game-board {
+  padding: 20px;
+}
+
+.component-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.component-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.component-card.selected {
+  border: 2px solid #1e87f0;
+  box-shadow: 0 0 15px rgba(30, 135, 240, 0.3);
+}
+
+.component-card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px 8px 0 0;
+}
+
+.computer-case {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.case-layout {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  padding: 20px;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  min-height: 500px;
+}
+
+.component-slot {
+  background-color: #fff;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 15px;
+  min-height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.component-slot:hover {
+  border-color: #1e87f0;
+  background-color: rgba(30, 135, 240, 0.1);
+}
+
+.component-slot.filled {
+  border-style: solid;
+  border-color: #32d296;
+}
+
+.placed-component {
+  text-align: center;
+}
+
+.placed-component img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.empty-slot {
+  color: #666;
+  text-align: center;
+}
+
+.game-over {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.trophy-icon {
+  font-size: 4em;
+  color: #ffc107;
+  margin-bottom: 20px;
+}
+
+.game-stats .uk-badge {
+  font-size: 1rem;
+  padding: 5px 10px;
+}
+
+/* Специфичные стили для слотов компонентов */
+.cpu-slot { grid-area: 1 / 1 / 2 / 2; }
+.motherboard-slot { grid-area: 1 / 2 / 3 / 3; }
+.ram-slot { grid-area: 2 / 1 / 3 / 2; }
+.gpu-slot { grid-area: 3 / 1 / 4 / 2; }
+.hdd-slot { grid-area: 3 / 2 / 4 / 3; }
+.psu-slot { grid-area: 4 / 1 / 5 / 3; } 

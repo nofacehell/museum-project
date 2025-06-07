@@ -135,9 +135,10 @@ const QuizEdit = () => {
 
   if (loading) {
     return (
-      <div className="uk-container">
+      <div className="uk-container uk-container-small uk-margin-large-top">
         <div className="uk-text-center">
-          <div className="uk-spinner" data-uk-spinner="ratio: 2"></div>
+          <div uk-spinner="ratio: 2"></div>
+          <p className="uk-margin-small-top uk-text-muted">Загрузка квиза...</p>
         </div>
       </div>
     );
@@ -145,8 +146,8 @@ const QuizEdit = () => {
 
   if (error) {
     return (
-      <div className="uk-container">
-        <div className="uk-alert uk-alert-danger">
+      <div className="uk-container uk-container-small uk-margin-large-top">
+        <div className="uk-alert-danger" uk-alert="true">
           <p>{error}</p>
         </div>
         <button 
@@ -160,59 +161,89 @@ const QuizEdit = () => {
   }
 
   return (
-    <div className="uk-container">
-      <h1 className="uk-heading-medium">
-        {isNewQuiz ? 'Создание нового квиза' : 'Редактирование квиза'}
-      </h1>
+    <div className="uk-container uk-container-small uk-margin-large-top">
+      <div className="uk-card uk-card-default uk-card-body uk-margin-medium-bottom">
+        <h1 className="uk-card-title uk-heading-divider">
+          {isNewQuiz ? 'Создание нового квиза' : 'Редактирование квиза'}
+        </h1>
+      </div>
       
       <form onSubmit={handleSubmit} className="uk-form-stacked">
-        <div className="uk-margin">
-          <label className="uk-form-label" htmlFor="title">Название квиза</label>
-          <div className="uk-form-controls">
-            <input
-              className="uk-input"
-              id="title"
-              type="text"
-              value={quiz.title}
-              onChange={(e) => setQuiz({ ...quiz, title: e.target.value })}
-              required
-            />
+        {/* Основная информация */}
+        <div className="uk-card uk-card-default uk-card-body uk-margin-medium-bottom">
+          <h3 className="uk-card-title">Основная информация</h3>
+          
+          <div className="uk-margin">
+            <label className="uk-form-label" htmlFor="title">Название квиза</label>
+            <div className="uk-form-controls">
+              <input
+                className="uk-input"
+                id="title"
+                type="text"
+                value={quiz.title}
+                onChange={(e) => setQuiz({ ...quiz, title: e.target.value })}
+                required
+                placeholder="Введите название квиза"
+              />
+            </div>
+          </div>
+
+          <div className="uk-margin">
+            <label className="uk-form-label" htmlFor="description">Описание</label>
+            <div className="uk-form-controls">
+              <textarea
+                className="uk-textarea"
+                id="description"
+                rows="5"
+                value={quiz.description}
+                onChange={(e) => setQuiz({ ...quiz, description: e.target.value })}
+                required
+                placeholder="Введите описание квиза"
+              ></textarea>
+            </div>
+          </div>
+
+          <div className="uk-grid-small" uk-grid="true">
+            <div className="uk-width-1-2@m">
+              <div className="uk-margin">
+                <label className="uk-form-label" htmlFor="difficulty">Сложность</label>
+                <div className="uk-form-controls">
+                  <select
+                    className="uk-select"
+                    id="difficulty"
+                    value={quiz.difficulty}
+                    onChange={(e) => setQuiz({ ...quiz, difficulty: e.target.value })}
+                    required
+                  >
+                    <option value="easy">Лёгкий</option>
+                    <option value="medium">Средний</option>
+                    <option value="hard">Сложный</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div className="uk-width-1-2@m">
+              <div className="uk-margin">
+                <label className="uk-form-label" htmlFor="category">Категория</label>
+                <div className="uk-form-controls">
+                  <input
+                    className="uk-input"
+                    id="category"
+                    type="text"
+                    value={quiz.category}
+                    onChange={(e) => setQuiz({ ...quiz, category: e.target.value })}
+                    required
+                    placeholder="Введите категорию"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="uk-margin">
-          <label className="uk-form-label" htmlFor="description">Описание</label>
-          <div className="uk-form-controls">
-            <textarea
-              className="uk-textarea"
-              id="description"
-              rows="5"
-              value={quiz.description}
-              onChange={(e) => setQuiz({ ...quiz, description: e.target.value })}
-              required
-            ></textarea>
-          </div>
-        </div>
-
-        <div className="uk-margin">
-          <label className="uk-form-label" htmlFor="difficulty">Сложность</label>
-          <div className="uk-form-controls">
-            <select
-              className="uk-select"
-              id="difficulty"
-              value={quiz.difficulty}
-              onChange={(e) => setQuiz({ ...quiz, difficulty: e.target.value })}
-              required
-            >
-              <option value="easy">Лёгкий</option>
-              <option value="medium">Средний</option>
-              <option value="hard">Сложный</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="uk-margin">
-          <label className="uk-form-label">Изображение обложки</label>
+        {/* Изображение обложки */}
+        <div className="uk-card uk-card-default uk-card-body uk-margin-medium-bottom">
+          <h3 className="uk-card-title">Изображение обложки</h3>
           <div className="file-upload-container">
             {quiz.image ? (
               <div className="image-preview-container">
@@ -223,7 +254,7 @@ const QuizEdit = () => {
                 />
                 <button 
                   type="button" 
-                  className="image-remove-btn" 
+                  className="uk-button uk-button-danger uk-button-small image-remove-btn" 
                   onClick={removeImage}
                   uk-tooltip="Удалить изображение"
                 >
@@ -248,11 +279,33 @@ const QuizEdit = () => {
           </div>
         </div>
 
-        <div className="uk-margin">
-          <label className="uk-form-label">Вопросы</label>
+        {/* Вопросы */}
+        <div className="uk-card uk-card-default uk-card-body uk-margin-medium-bottom">
+          <div className="uk-flex uk-flex-middle uk-margin-bottom">
+            <h3 className="uk-card-title uk-margin-remove-bottom">Вопросы</h3>
+            <button
+              type="button"
+              className="uk-button uk-button-primary uk-margin-left"
+              onClick={addQuestion}
+            >
+              <span uk-icon="icon: plus"></span> Добавить вопрос
+            </button>
+          </div>
+
           <div className="uk-form-controls">
             {quiz.questions.map((question, qIndex) => (
               <div key={qIndex} className="uk-card uk-card-default uk-card-body uk-margin">
+                <div className="uk-flex uk-flex-middle uk-margin-bottom">
+                  <h4 className="uk-card-title uk-margin-remove-bottom">Вопрос {qIndex + 1}</h4>
+                  <button
+                    type="button"
+                    className="uk-button uk-button-danger uk-button-small uk-margin-left"
+                    onClick={() => removeQuestion(qIndex)}
+                  >
+                    <span uk-icon="icon: trash"></span>
+                  </button>
+                </div>
+
                 <div className="uk-margin">
                   <label className="uk-form-label">Текст вопроса</label>
                   <div className="uk-form-controls">
@@ -262,6 +315,7 @@ const QuizEdit = () => {
                       value={question.text}
                       onChange={(e) => handleQuestionChange(qIndex, 'text', e.target.value)}
                       required
+                      placeholder="Введите текст вопроса"
                     />
                   </div>
                 </div>
@@ -282,10 +336,11 @@ const QuizEdit = () => {
                               handleQuestionChange(qIndex, 'options', newOptions);
                             }}
                             required
+                            placeholder={`Вариант ответа ${oIndex + 1}`}
                           />
                         </div>
                         <div className="uk-form-controls uk-margin-small-top">
-                          <label>
+                          <label className="uk-form-label">
                             <input
                               className="uk-radio"
                               type="radio"
@@ -293,44 +348,33 @@ const QuizEdit = () => {
                               checked={question.correctAnswer === oIndex}
                               onChange={() => handleQuestionChange(qIndex, 'correctAnswer', oIndex)}
                             />
-                            Правильный ответ
+                            <span className="uk-margin-small-left">Правильный ответ</span>
                           </label>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
-
-                <button
-                  type="button"
-                  className="uk-button uk-button-danger uk-margin-top"
-                  onClick={() => removeQuestion(qIndex)}
-                >
-                  Удалить вопрос
-                </button>
               </div>
             ))}
-
-            <button
-              type="button"
-              className="uk-button uk-button-secondary"
-              onClick={addQuestion}
-            >
-              Добавить вопрос
-            </button>
           </div>
         </div>
 
-        <div className="uk-margin">
+        {/* Кнопки действий */}
+        <div className="uk-margin uk-flex uk-flex-middle">
           <button type="submit" className="uk-button uk-button-primary">
-            {isNewQuiz ? 'Создать квиз' : 'Сохранить изменения'}
+            <span uk-icon="icon: check"></span>
+            <span className="uk-margin-small-left">
+              {isNewQuiz ? 'Создать квиз' : 'Сохранить изменения'}
+            </span>
           </button>
           <button
             type="button"
             className="uk-button uk-button-default uk-margin-left"
             onClick={() => navigate('/admin/dashboard')}
           >
-            Отмена
+            <span uk-icon="icon: close"></span>
+            <span className="uk-margin-small-left">Отмена</span>
           </button>
         </div>
       </form>

@@ -1,0 +1,327 @@
+/* Общие стили для всех игровых страниц */
+.game-page {
+  min-height: 100vh;
+  padding-top: 80px;
+  background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+  color: white;
+}
+
+.game-page-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 80px;
+}
+
+/* Кнопка "Назад к играм" */
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  margin-bottom: 32px;
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateX(-5px);
+}
+
+.back-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Заголовок игры */
+.game-title {
+  font-size: 3rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #60a5fa 0%, #93c5fd 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 16px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Описание игры */
+.game-description {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 600px;
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+/* Метки игры */
+.game-badges {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.game-badge {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.game-badge.category {
+  background: rgba(96, 165, 250, 0.2);
+  color: #93c5fd;
+}
+
+.game-badge.difficulty {
+  background: rgba(248, 113, 113, 0.2);
+  color: #fca5a5;
+}
+
+.game-badge.time {
+  background: rgba(52, 211, 153, 0.2);
+  color: #6ee7b7;
+}
+
+/* Контейнер игры */
+.game-container {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 32px;
+  margin-top: 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Кнопка начала игры */
+.start-game-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 32px;
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.start-game-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
+}
+
+.start-game-button:active {
+  transform: translateY(0);
+}
+
+/* Адаптивный дизайн */
+@media (max-width: 768px) {
+  .game-title {
+    font-size: 2rem;
+  }
+
+  .game-description {
+    font-size: 1rem;
+  }
+
+  .game-badges {
+    flex-direction: column;
+  }
+
+  .game-container {
+    padding: 16px;
+  }
+
+  .start-game-button {
+    padding: 12px 24px;
+    font-size: 1rem;
+  }
+}
+
+/* Специфичные стили для каждой игры */
+.memory-game .game-container {
+  background: rgba(96, 165, 250, 0.1);
+}
+
+.timeline-game .game-container {
+  background: rgba(52, 211, 153, 0.1);
+}
+
+.puzzle-game .game-container {
+  background: rgba(248, 113, 113, 0.1);
+}
+
+.game-header {
+  background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+  color: white;
+  padding: 3rem 0;
+}
+
+.game-header .uk-button-link {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.3s ease;
+}
+
+.game-header .uk-button-link:hover {
+  color: white;
+}
+
+.game-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.game-category-badge {
+  background: linear-gradient(135deg, var(--primary-color), #2c3e50);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+}
+
+.game-difficulty-badge {
+  background: linear-gradient(135deg, var(--secondary-color), #e74c3c);
+}
+
+.game-content {
+  padding: 2rem 0;
+}
+
+.game-content .uk-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.uk-button-primary {
+  background: linear-gradient(135deg, var(--primary-color), #2c3e50);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-transform: none;
+  letter-spacing: 0.5px;
+}
+
+.uk-button-primary:hover {
+  background: linear-gradient(135deg, #2c3e50, var(--primary-color));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* --- Новый стиль intro-баннера игры --- */
+.game-intro-banner {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 60vh;
+  padding: 48px 0 32px;
+}
+
+.game-intro-card {
+  background: linear-gradient(135deg, #232b47 0%, #2c5282 100%);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  border-radius: 24px;
+  padding: 40px 32px 32px 32px;
+  max-width: 900px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  position: relative;
+}
+
+.game-intro-content {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-intro-image-block {
+  flex: 0 0 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-intro-image {
+  width: 240px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  background: #1a202c;
+}
+
+.game-intro-info {
+  flex: 1 1 0%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.game-intro-card .back-button {
+  position: absolute;
+  top: 24px;
+  left: 32px;
+  z-index: 2;
+  margin-bottom: 0;
+}
+
+@media (max-width: 900px) {
+  .game-intro-content {
+    flex-direction: column;
+    gap: 24px;
+    align-items: stretch;
+  }
+  .game-intro-image-block {
+    justify-content: flex-start;
+  }
+  .game-intro-image {
+    width: 100%;
+    max-width: 320px;
+    height: 180px;
+  }
+}
+
+@media (max-width: 600px) {
+  .game-intro-card {
+    padding: 24px 8px 16px 8px;
+    border-radius: 14px;
+  }
+  .game-intro-image {
+    height: 120px;
+    border-radius: 10px;
+  }
+  .game-title {
+    font-size: 1.5rem;
+  }
+} 

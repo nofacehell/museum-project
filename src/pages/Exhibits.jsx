@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import "uikit/dist/css/uikit.min.css";
 import UIkit from "uikit";
@@ -6,7 +6,26 @@ import Icons from "uikit/dist/js/uikit-icons";
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import '../styles/exhibits.css';
-import { getExhibits } from '../utils/api';
+import { getExhibits, getCategories } from '../utils/api';
+import { getStaticUrl } from '../utils/config';
+import { initParallax } from '../utils/parallax';
+import {
+  Box,
+  Container,
+  Grid,
+  Heading,
+  Text,
+  Image,
+  VStack,
+  HStack,
+  Input,
+  Select,
+  Button,
+  useToast,
+  Badge,
+  Flex,
+  Spinner,
+} from '@chakra-ui/react';
 
 // Подключаем иконки UIkit
 UIkit.use(Icons);
@@ -22,40 +41,26 @@ const debugExhibits = (message, data) => {
 const DEFAULT_EXHIBITS = [
   {
     id: '1',
-    title: 'Apple Macintosh',
-    description: 'The original Macintosh was the first commercially successful personal computer to feature a mouse and a graphical user interface rather than a command-line interface.',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/e/e3/Macintosh_128k_transparency.png',
-    category: 'Компьютеры'
-  },
-  {
-    id: '2',
     title: 'Sony Walkman TPS-L2',
     description: 'The Sony Walkman TPS-L2 was the first portable, personal cassette player introduced in 1979, changing how people listen to music on the go.',
     image: 'https://upload.wikimedia.org/wikipedia/commons/8/8b/Sony-TPS-L2.jpg',
-    category: 'Аудиотехника'
+    category: 'audio'
+  },
+  {
+    id: '2',
+    title: 'Sony Trinitron KV-1311CR',
+    description: 'The Sony Trinitron was a line of color television sets produced by Sony. The KV-1311CR was one of the first models, featuring the revolutionary Trinitron picture tube technology.',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Sony_Trinitron_KV-1311CR.jpg/1024px-Sony_Trinitron_KV-1311CR.jpg',
+    category: 'video'
   },
   {
     id: '3',
-    title: 'Nokia 3310',
-    description: 'The Nokia 3310 is an iconic mobile phone known for its durability, long battery life, and the game Snake II. It was one of the most successful phones of all time.',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Nokia_3310_Blue_R7309170_%28retouch%29.png/1024px-Nokia_3310_Blue_R7309170_%28retouch%29.png',
-    category: 'Мобильные устройства'
+    title: 'Philips Senseo',
+    description: 'The Philips Senseo was one of the first pod-based coffee makers, introducing a new way to make single-serve coffee at home.',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Philips_Senseo.jpg/1024px-Philips_Senseo.jpg',
+    category: 'appliances'
   }
 ];
-
-// Маппинг категорий: английские ключи (для UI) -> русские названия (из БД)
-const categoryMapping = {
-  'computers': 'Компьютеры',
-  'phones': 'Мобильные устройства',
-  'audio': 'Аудиотехника',
-  'gaming': 'Игровые консоли'
-};
-
-// Обратный маппинг для удобства проверки
-const reverseCategoryMapping = Object.entries(categoryMapping).reduce((acc, [key, value]) => {
-  acc[value] = key;
-  return acc;
-}, {});
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
@@ -63,16 +68,25 @@ const getImageUrl = (imagePath) => {
   if (!imagePath) return 'https://placehold.co/300x200/cccccc/333333?text=Нет+изображения';
   if (imagePath.startsWith('http')) return imagePath;
   if (imagePath.startsWith('data:image')) return imagePath;
-  if (imagePath.startsWith('/uploads')) return `${API_URL}${imagePath}`;
-  return `${API_URL}/uploads/${imagePath}`;
+  return getStaticUrl(imagePath);
 };
+
+const FIXED_CATEGORIES = [
+  'Разное',
+  'Аудиотехника',
+  'Видеотехника',
+  'Бытовая техника'
+];
 
 const Exhibits = () => {
   const [exhibits, setExhibits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const heroRef = useRef(null);
+  const toast = useToast();
+  const [categories, setCategories] = useState([]);
 
   const loadExhibits = async () => {
     setLoading(true);
@@ -122,161 +136,242 @@ const Exhibits = () => {
     AOS.init({
       duration: 800,
       once: true,
+      offset: 100,
+      easing: 'ease-out-cubic'
     });
+    
+    // Initialize parallax effect
+    const parallaxCleanup = initParallax();
     
     // Load exhibits on component mount
     loadExhibits();
     
     // Add event listener for storage events (if using localStorage)
-    window.addEventListener('storage', (e) => {
+    const handleStorage = (e) => {
       if (e.key === 'exhibits') {
         loadExhibits();
       }
-    });
+    };
     
-    // Cleanup event listener
+    window.addEventListener('storage', handleStorage);
+    
+    // Cleanup event listeners and parallax
     return () => {
-      window.removeEventListener('storage', () => {});
+      window.removeEventListener('storage', handleStorage);
+      if (typeof parallaxCleanup === 'function') {
+        parallaxCleanup();
+      }
     };
   }, []);
 
-  // Filter exhibits based on category and search query
-  const filteredExhibits = exhibits.filter((exhibit) => {
-    // Проверяем категорию с учетом маппинга
-    const matchesCategory = selectedCategory === 'all' || 
-                           categoryMapping[selectedCategory] === exhibit.category;
-    
+  useEffect(() => {
+    getCategories().then(setCategories).catch(() => setCategories([]));
+  }, []);
+
+  const filteredExhibits = exhibits.filter(exhibit => {
     const matchesSearch = exhibit.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          exhibit.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
+                         exhibit.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = !selectedCategory || 
+      (exhibit.categoryId && String(exhibit.categoryId) === String(selectedCategory));
+    return matchesSearch && matchesCategory;
   });
 
   // Отладочная информация
   useEffect(() => {
     console.log(`Текущая выбранная категория: ${selectedCategory}`);
-    console.log(`Ожидаемая категория в БД: ${categoryMapping[selectedCategory] || 'Все'}`);
     console.log('Доступные экспонаты:', exhibits);
     console.log('Отфильтрованные экспонаты:', filteredExhibits);
   }, [selectedCategory, exhibits, filteredExhibits]);
 
-  const categories = ['all', 'computers', 'phones', 'audio', 'gaming'];
-  
-  const categoryLabels = {
-    all: 'Все экспонаты',
-    computers: 'Компьютеры',
-    phones: 'Телефоны',
-    audio: 'Аудио',
-    gaming: 'Игровые консоли'
-  };
+  if (loading) {
+    return (
+      <Flex justify="center" align="center" minH="50vh">
+        <Spinner size="xl" />
+      </Flex>
+    );
+  }
 
   return (
-    <div className="uk-section exhibits-section" style={{ marginTop: "60px", paddingTop: "30px" }}>
-      <div className="uk-container">
-        <h1 className="uk-heading-medium uk-text-center uk-margin-medium-bottom" data-aos="fade-up">
-          Экспонаты музея электроники
-        </h1>
-        
-        {/* Search and Filter Controls */}
-        <div className="uk-margin-medium-bottom uk-flex uk-flex-middle uk-flex-wrap" data-aos="fade-up" data-aos-delay="100">
-          <div className="uk-search uk-search-default uk-width-medium uk-margin-right">
-            <span uk-search-icon="true"></span>
-            <input 
-              className="uk-search-input" 
-              type="search" 
-              placeholder="Поиск экспонатов..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+    <div className="exhibits-section">
+      {/* Hero Section */}
+      <div className="exhibits-hero uk-section uk-light" ref={heroRef}>
+        <div className="uk-container">
+          <div className="hero-content">
+            <div className="hero-text" data-aos="fade-right" data-aos-delay="100">
+              <span className="exhibits-badge">Виртуальная коллекция</span>
+              <h1 className="uk-heading-medium">Экспонаты музея электроники</h1>
+              <p className="uk-text-large">Исследуйте важнейшие инновации и открытия в мире электронных устройств, изменивших нашу жизнь.</p>
+              <div className="uk-margin">
+                <span className="uk-label uk-margin-small-right" data-aos="fade-up" data-aos-delay="200">
+                  {exhibits.length} экспонатов
+                </span>
+              </div>
+            </div>
+            <div className="hero-image-wrapper" data-aos="fade-left" data-aos-delay="200">
+              <div className="hero-image-container">
+                <img 
+                  src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Macintosh_128k_transparency.png" 
+                  alt="Винтажный компьютер" 
+                  className="hero-image"
+                  loading="lazy"
+                />
+                <div className="hero-image-decoration"></div>
+              </div>
+            </div>
           </div>
-          
-          <div className="uk-button-group category-filters uk-flex-wrap">
-            {categories.map((category) => (
-              <button 
-                key={category}
-                className={`uk-button ${selectedCategory === category ? 'uk-button-primary' : 'uk-button-default'} uk-margin-small-right uk-margin-small-bottom`}
-                onClick={() => setSelectedCategory(category)}
-              >
-                {categoryLabels[category]}
-              </button>
-            ))}
+        </div>
+      </div>
+      
+      <div className="uk-container uk-margin-large-top">
+        {/* Search and Filter Controls */}
+        <div className="filter-card uk-card uk-card-default uk-margin-medium-bottom" data-aos="fade-up">
+          <div className="uk-card-body">
+            <div className="uk-grid-small uk-flex-middle" data-uk-grid="true">
+              <div className="uk-width-expand@s">
+                <div className="uk-search uk-search-default uk-width-1-1">
+                  <span data-uk-search-icon="true"></span>
+                  <input 
+                    className="uk-search-input" 
+                    type="search" 
+                    placeholder="Поиск экспонатов..." 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="uk-width-auto@s uk-text-right">
+                <select
+                  className="uk-select"
+                  value={selectedCategory}
+                  onChange={e => setSelectedCategory(e.target.value)}
+                  style={{ minWidth: 180 }}
+                >
+                  <option value="">Все категории</option>
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
         </div>
         
         {/* Loading State */}
         {loading && (
-          <div className="uk-text-center uk-margin-medium-top">
-            <div uk-spinner="ratio: 2"></div>
-            <p className="uk-margin-small-top">Загрузка экспонатов...</p>
+          <div className="uk-text-center uk-margin-medium-top uk-padding uk-padding-large">
+            <div className="uk-spinner-wrapper">
+              <div uk-spinner="ratio: 3"></div>
+            </div>
+            <p className="uk-text-lead uk-margin-medium-top">Загрузка экспонатов...</p>
           </div>
         )}
         
         {/* Error State */}
         {error && !loading && (
-          <div className="uk-alert-danger" uk-alert="true">
+          <div className="uk-alert-danger uk-padding uk-card uk-card-default" uk-alert="true">
+            <h3><span uk-icon="icon: warning; ratio: 1.5" className="uk-margin-small-right"></span> Возникла ошибка</h3>
             <p>{error}</p>
             <button 
               className="uk-button uk-button-primary uk-margin-small-top" 
               onClick={loadExhibits}
             >
+              <span uk-icon="icon: refresh" className="uk-margin-small-right"></span>
               Попробовать снова
             </button>
           </div>
         )}
         
-        {/* Debug Info */}
-        {/* {process.env.NODE_ENV === 'development' && (
-          <div className="uk-margin-medium-bottom uk-alert-primary" uk-alert="true">
-            <h3>Отладочная информация</h3>
-            <p>Выбранная категория: {selectedCategory}</p>
-            <p>Количество экспонатов: {exhibits.length}</p>
-            <p>Отфильтровано: {filteredExhibits.length}</p>
-          </div>
-        )} */}
-        
         {/* Exhibits Grid */}
         {!loading && !error && (
           <>
+            <div className="uk-margin-medium-bottom uk-flex uk-flex-middle uk-flex-between">
+              <h2 className="uk-heading-bullet">
+                {selectedCategory === '' ? 'Все экспонаты' : selectedCategory}
+                <span className="uk-text-muted uk-margin-left">({filteredExhibits.length})</span>
+              </h2>
+              
+              {filteredExhibits.length > 0 && (
+                <div className="uk-text-meta uk-visible@s">
+                  <span data-uk-icon="icon: grid" className="uk-margin-small-right"></span>
+                  Отображение {filteredExhibits.length} из {exhibits.length} экспонатов
+                </div>
+              )}
+            </div>
+            
             {filteredExhibits.length === 0 ? (
-              <div className="uk-alert-warning" uk-alert="true">
-                <p>Экспонаты не найдены. Пожалуйста, измените параметры поиска.</p>
+              <div className="empty-state uk-text-center uk-padding uk-padding-large uk-card uk-card-default uk-card-body" data-aos="fade-up">
+                <span data-uk-icon="icon: search; ratio: 3" className="uk-margin-medium-bottom"></span>
+                <h3>Экспонаты не найдены</h3>
+                <p className="uk-text-muted">По вашему запросу ничего не найдено. Попробуйте изменить критерии поиска.</p>
+                <button 
+                  className="uk-button uk-button-primary uk-margin-small-top" 
+                  onClick={() => {
+                    setSelectedCategory('');
+                    setSearchQuery('');
+                  }}
+                >
+                  Сбросить фильтры
+                </button>
               </div>
             ) : (
-              <div className="uk-grid uk-child-width-1-3@m uk-child-width-1-2@s uk-child-width-1-1 uk-grid-match" uk-grid="true">
+              <div className="exhibits-grid">
                 {filteredExhibits.map((exhibit, index) => (
-                  <div key={exhibit.id || index} data-aos="fade-up" data-aos-delay={100 + index * 50}>
-                    <div className="uk-card uk-card-default uk-card-hover">
-                      <div className="uk-card-media-top uk-text-center uk-padding-small">
-                        <img 
-                          src={getImageUrl(exhibit.image)} 
-                          alt={exhibit.title} 
-                          style={{ maxHeight: '200px', width: 'auto', margin: '0 auto' }}
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = 'https://placehold.co/300x200/cccccc/333333?text=Нет+изображения';
-                          }}
-                        />
+                  <div key={exhibit.id || index} data-aos="fade-up" data-aos-delay={100 + (index % 5) * 50}>
+                    <div className="exhibit-card uk-card uk-card-default uk-card-hover">
+                      <div className="uk-card-media-top">
+                        <div className="exhibit-image-container">
+                          <img 
+                            src={getImageUrl(exhibit.image)} 
+                            alt={exhibit.title}
+                            className="exhibit-image"
+                            loading="lazy"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = 'https://placehold.co/600x400/cccccc/333333?text=Нет+изображения';
+                            }}
+                          />
+                          <div className="exhibit-image-overlay">
+                            <Link to={`/exhibits/${exhibit.id}`} className="uk-position-cover"></Link>
+                          </div>
+                        </div>
                       </div>
                       <div className="uk-card-body">
-                        <h3 className="uk-card-title">{exhibit.title}</h3>
-                        <p className="uk-text-truncate">{exhibit.description}</p>
-                        <span 
-                          className={`uk-label ${
-                            reverseCategoryMapping[exhibit.category] === 'computers' ? 'uk-label-success' :
-                            reverseCategoryMapping[exhibit.category] === 'phones' ? 'uk-label-warning' :
-                            reverseCategoryMapping[exhibit.category] === 'audio' ? 'uk-label-danger' :
-                            'uk-label-primary'
-                          }`}
-                        >
+                        <div className="uk-card-badge uk-label">
                           {exhibit.category}
-                        </span>
-                        <div className="uk-margin-small-top">
-                          <Link 
-                            to={`/exhibits/${exhibit.id}`} 
-                            className="uk-button uk-button-text"
-                          >
-                            Подробнее &rarr;
-                          </Link>
                         </div>
+                        <h3 className="uk-card-title">{exhibit.title}</h3>
+                        {(exhibit.category || exhibit.categoryId) && (
+                          <div className="uk-text-meta uk-margin-small-bottom">
+                            <span style={{
+                              background: '#ffe066',
+                              color: '#222',
+                              fontWeight: 600,
+                              fontSize: 15,
+                              borderRadius: 6,
+                              padding: '2px 10px',
+                              display: 'inline-block',
+                              letterSpacing: 0.5,
+                              boxShadow: '0 1px 4px #e0e7ff55'
+                            }}>
+                              {exhibit.category || (categories.find(cat => cat.id === exhibit.categoryId)?.name) || 'Без категории'}
+                            </span>
+                          </div>
+                        )}
+                        <p className="exhibit-description">
+                          {exhibit.shortDescription || 
+                           (exhibit.description && exhibit.description.length > 120 
+                             ? `${exhibit.description.substring(0, 120)}...` 
+                             : exhibit.description)
+                          }
+                        </p>
+                      </div>
+                      <div className="uk-card-footer">
+                        <Link 
+                          to={`/exhibits/${exhibit.id}`} 
+                          className="uk-button uk-button-text"
+                        >
+                          Подробнее <span data-uk-icon="icon: chevron-right"></span>
+                        </Link>
                       </div>
                     </div>
                   </div>

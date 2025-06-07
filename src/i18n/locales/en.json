@@ -1,0 +1,14 @@
+{
+  "navigation": {
+    "exhibits": "Exhibits",
+    "quizzes": "Quizzes",
+    "games": "Games",
+    "about": "About",
+    "reviews": "Reviews",
+    "admin": "Admin"
+  },
+  "header": {
+    "title": "Online Museum",
+    "language": "Language"
+  }
+} 

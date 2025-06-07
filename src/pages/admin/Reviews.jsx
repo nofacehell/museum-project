@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { getAdminReviews, updateReviewStatus } from '../../utils/api';
+import { getAdminReviews, updateReviewStatus, deleteReview } from '../../utils/api';
+import { getStaticUrl, STATIC_URL } from '../../utils/config';
 
 /**
  * Компонент для управления отзывами в админ-панели
@@ -35,10 +36,14 @@ const Reviews = () => {
           const formattedReviews = data.map(review => {
             const processedImages = formatReviewImages(review);
             
+            // Проверяем наличие текста отзыва
+            const reviewText = review.text || review.comment || 'Текст отзыва отсутствует';
+            
             return {
               id: review.id || review._id,
               name: review.name,
-              text: review.text || review.comment,
+              text: reviewText,
+              comment: reviewText, // Добавляем поле comment для совместимости
               rating: review.rating || 5,
               images: processedImages,
               image: processedImages.length > 0 ? processedImages[0] : null,
@@ -193,14 +198,32 @@ const Reviews = () => {
       images.unshift(review.image);
     }
     
+    console.log('Processed images for review:', review.id, images);
     return images;
+  };
+
+  // Функция для получения полного URL изображения
+  const getImageUrl = (image) => {
+    if (!image) return '';
+    if (image.startsWith('http')) return image;
+    
+    // Если путь уже содержит /uploads, используем базовый URL
+    if (image.startsWith('/uploads/')) {
+      return `${STATIC_URL}${image}`;
+    }
+    
+    // Для случаев когда приходит только имя файла
+    return `${STATIC_URL}/uploads/reviews/${image}`;
   };
 
   // Если данные загружаются, показываем индикатор загрузки
   if (loading) {
     return (
-      <div style={styles.container} className="admin-reviews-container">
-        <div style={styles.loading} className="admin-loading">Загрузка отзывов...</div>
+      <div className="uk-container uk-container-small uk-margin-large-top">
+        <div className="uk-text-center">
+          <div uk-spinner="ratio: 2"></div>
+          <p className="uk-margin-small-top uk-text-muted">Загрузка отзывов...</p>
+        </div>
       </div>
     );
   }
@@ -208,8 +231,10 @@ const Reviews = () => {
   // Если есть ошибка, показываем сообщение об ошибке
   if (error) {
     return (
-      <div style={styles.container} className="admin-reviews-container">
-        <div style={styles.error} className="admin-error">{error}</div>
+      <div className="uk-container uk-container-small uk-margin-large-top">
+        <div className="uk-alert-danger" uk-alert="true">
+          <p>{error}</p>
+        </div>
       </div>
     );
   }
@@ -219,32 +244,39 @@ const Reviews = () => {
   const pendingCount = reviews.filter(review => !review.approved).length;
 
   return (
-    <div style={styles.container} className="admin-reviews-container">
-      <div style={styles.header} className="admin-reviews-header">
-        <h2 style={styles.title} className="admin-reviews-title">Управление отзывами</h2>
-        <div style={styles.statsContainer} className="admin-stats-container">
-          <div style={styles.statCard} className="admin-stat-card">
-            <div style={styles.statValue} className="admin-stat-value">{reviews.length}</div>
-            <div style={styles.statLabel} className="admin-stat-label">Всего отзывов</div>
+    <div className="uk-container uk-container-small uk-margin-large-top admin-reviews-container">
+      {/* Header Section */}
+      <div className="uk-card uk-card-default uk-card-body uk-margin-medium-bottom">
+        {/* Stats Cards */}
+        <div className="uk-grid-small uk-child-width-1-3@m" uk-grid="true">
+          <div>
+            <div className="uk-card uk-card-primary uk-card-body uk-text-center">
+              <h3 className="uk-card-title">{reviews.length}</h3>
+              <p className="uk-text-meta">Всего отзывов</p>
+            </div>
           </div>
-          <div style={styles.statCard} className="admin-stat-card">
-            <div style={styles.statValue} className="admin-stat-value">{approvedCount}</div>
-            <div style={styles.statLabel} className="admin-stat-label">Одобрено</div>
+          <div>
+            <div className="uk-card uk-card-secondary uk-card-body uk-text-center">
+              <h3 className="uk-card-title">{approvedCount}</h3>
+              <p className="uk-text-meta">Одобрено</p>
+            </div>
           </div>
-          <div style={styles.statCard} className="admin-stat-card">
-            <div style={styles.statValue} className="admin-stat-value">{pendingCount}</div>
-            <div style={styles.statLabel} className="admin-stat-label">На рассмотрении</div>
+          <div>
+            <div className="uk-card uk-card-default uk-card-body uk-text-center">
+              <h3 className="uk-card-title">{pendingCount}</h3>
+              <p className="uk-text-meta">На рассмотрении</p>
+            </div>
           </div>
         </div>
       </div>
 
-      <div style={styles.filters} className="admin-reviews-filters">
-        <div style={styles.filter} className="admin-filter">
-          <label style={styles.filterLabel} className="admin-filter-label">
-            Статус:
+      {/* Filters Section */}
+      <div className="uk-card uk-card-default uk-card-body uk-margin-medium-bottom">
+        <div className="uk-grid-small" uk-grid="true">
+          <div className="uk-width-1-3@m">
+            <label className="uk-form-label">Статус:</label>
             <select 
-              style={styles.filterSelect} 
-              className="admin-filter-select"
+              className="uk-select"
               value={selectedStatus} 
               onChange={handleStatusFilterChange}
             >
@@ -252,97 +284,105 @@ const Reviews = () => {
               <option value="approved">Одобренные</option>
               <option value="pending">На рассмотрении</option>
             </select>
-          </label>
+          </div>
         </div>
       </div>
 
-      <div style={styles.tableContainer} className="admin-table-container">
-        <table style={styles.table} className="admin-table">
-          <thead style={styles.tableHead} className="admin-table-head">
-            <tr>
-              <th style={styles.tableHeaderCell} className="admin-table-header-cell">
-                <button 
-                  style={styles.sortButton} 
-                  className="admin-sort-button"
-                  onClick={() => handleSortChange('name')}
-                >
-                  Имя {getSortIcon('name')}
-                </button>
-              </th>
-              <th style={styles.tableHeaderCell} className="admin-table-header-cell">
-                <button 
-                  style={styles.sortButton} 
-                  className="admin-sort-button"
-                  onClick={() => handleSortChange('rating')}
-                >
-                  Рейтинг {getSortIcon('rating')}
-                </button>
-              </th>
-              <th style={styles.tableHeaderCellWide} className="admin-table-header-cell-wide">Отзыв</th>
-              <th style={styles.tableHeaderCell} className="admin-table-header-cell">Фото</th>
-              <th style={styles.tableHeaderCell} className="admin-table-header-cell">
-                <button 
-                  style={styles.sortButton} 
-                  className="admin-sort-button"
-                  onClick={() => handleSortChange('created_at')}
-                >
-                  Дата {getSortIcon('created_at')}
-                </button>
-              </th>
-              <th style={styles.tableHeaderCell} className="admin-table-header-cell">Статус</th>
-              <th style={styles.tableHeaderCell} className="admin-table-header-cell">Действия</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredAndSortedReviews().map(review => (
-              <tr key={review.id} style={styles.tableRow} className="admin-table-row">
-                <td style={styles.tableCell} className="admin-table-cell">{review.name}</td>
-                <td style={styles.tableCell} className="admin-table-cell">{renderStars(review.rating)}</td>
-                <td style={styles.tableCellWide} className="admin-table-cell-wide">
-                  {review.text || review.comment}
-                </td>
-                <td style={styles.tableCell} className="admin-table-cell">
-                  {review.images && review.images.length > 0 && (
-                    <div style={styles.imageContainer}>
-                      <img 
-                        src={review.images[0]} 
-                        alt="Фото к отзыву" 
-                        style={styles.reviewImage}
-                        className="admin-review-image"
-                      />
-                      {review.images.length > 1 && (
-                        <div style={styles.imageCounter}>+{review.images.length - 1}</div>
-                      )}
-                    </div>
-                  )}
-                </td>
-                <td style={styles.tableCell} className="admin-table-cell">
-                  {formatDate(review.created_at || review.createdAt || review.updatedAt)}
-                </td>
-                <td style={styles.tableCell} className="admin-table-cell">{renderStatus(review.approved)}</td>
-                <td style={styles.tableCell} className="admin-table-cell">
-                  {review.approved ? (
-                    <button 
-                      style={styles.rejectButton} 
-                      className="admin-reject-button"
-                      onClick={() => handleStatusChange(review.id, 'rejected')}
-                    >
-                      Отклонить
-                    </button>
-                  ) : (
-                    <button 
-                      style={styles.approveButton} 
-                      className="admin-approve-button"
-                      onClick={() => handleStatusChange(review.id, 'approved')}
-                    >
-                      Одобрить
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* Reviews Grid */}
+      <div className="uk-grid-small uk-child-width-1-2@m" uk-grid="true">
+        {filteredAndSortedReviews().map(review => (
+          <div key={review.id}>
+            <div className="uk-card uk-card-default uk-card-hover">
+              <div className="uk-card-header">
+                <div className="uk-grid-small uk-flex-middle" uk-grid="true">
+                  <div className="uk-width-auto">
+                    {review.images && review.images.length > 0 && (
+                      <div className="uk-inline">
+                        <img 
+                          src={getImageUrl(review.images[0])} 
+                          alt="Фото к отзыву" 
+                          className="uk-border-circle"
+                          width="50"
+                          height="50"
+                          onError={(e) => {
+                            e.target.src = 'https://placehold.co/50x50?text=Ошибка';
+                          }}
+                        />
+                        {review.images.length > 1 && (
+                          <div className="uk-position-bottom-right uk-label uk-label-danger">
+                            +{review.images.length - 1}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <div className="uk-width-expand">
+                    <h3 className="uk-card-title uk-margin-remove-bottom">{review.name}</h3>
+                    <p className="uk-text-meta uk-margin-remove-top">
+                      {formatDate(review.created_at || review.createdAt || review.updatedAt)}
+                    </p>
+                  </div>
+                  <div className="uk-width-auto">
+                    {review.approved ? (
+                      <span className="uk-label uk-label-success">Одобрен</span>
+                    ) : (
+                      <span className="uk-label uk-label-warning">На рассмотрении</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="uk-card-body">
+                <div className="uk-margin-small-bottom">
+                  {renderStars(review.rating)}
+                </div>
+                <p className="uk-text-break">
+                  {review.text || review.comment || 'Текст отзыва отсутствует'}
+                </p>
+              </div>
+              <div className="uk-card-footer">
+                <div className="uk-grid-small uk-flex-middle" uk-grid="true">
+                  <div className="uk-width-expand">
+                    {review.images && review.images.length > 0 && (
+                      <div className="uk-grid-small uk-child-width-1-4" uk-grid="true">
+                        {review.images.slice(0, 4).map((image, index) => (
+                          <div key={index}>
+                            <img 
+                              src={getImageUrl(image)} 
+                              alt={`Фото ${index + 1}`}
+                              className="uk-border-rounded"
+                              width="60"
+                              height="60"
+                              onError={(e) => {
+                                e.target.src = 'https://placehold.co/60x60?text=Ошибка';
+                              }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="uk-width-auto">
+                    {review.approved ? (
+                      <button 
+                        className="uk-button uk-button-danger uk-button-small"
+                        onClick={() => handleStatusChange(review.id, 'rejected')}
+                      >
+                        Отклонить
+                      </button>
+                    ) : (
+                      <button 
+                        className="uk-button uk-button-primary uk-button-small"
+                        onClick={() => handleStatusChange(review.id, 'approved')}
+                      >
+                        Одобрить
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -467,9 +507,10 @@ const styles = {
     color: '#374151',
     verticalAlign: 'middle',
     maxWidth: '300px',
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-word',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    whiteSpace: 'normal',
   },
   approvedStatus: {
     display: 'inline-block',
@@ -533,8 +574,8 @@ const styles = {
     fontSize: '16px',
   },
   reviewImage: {
-    width: '60px',
-    height: '60px',
+    width: '100%',
+    height: '100%',
     objectFit: 'cover',
     borderRadius: '4px',
   },
@@ -542,16 +583,18 @@ const styles = {
     position: 'relative',
     width: '60px',
     height: '60px',
+    borderRadius: '4px',
+    overflow: 'hidden',
   },
   imageCounter: {
     position: 'absolute',
     bottom: '2px',
     right: '2px',
-    background: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     color: 'white',
+    fontSize: '10px',
     padding: '2px 4px',
     borderRadius: '4px',
-    fontSize: '10px',
   },
 };
 

@@ -1,0 +1,1241 @@
+/* Основные стили для главной страницы */
+:root {
+  --primary: #3b82f6;
+  --primary-dark: #2563eb;
+  --primary-light: #93c5fd;
+  --text: #1f2937;
+  --text-light: #6b7280;
+  --background: #f9fafb;
+  --card-bg: #ffffff;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  --border-radius-sm: 12px;
+  --border-radius-md: 18px;
+  --border-radius-lg: 24px;
+  --border-radius-xl: 32px;
+  --transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  --primary-text: #2c3e50;
+  --secondary-text: #4a5568;
+  --accent-color: #61dafb;
+  --bg-primary: #f8fafc;
+  --bg-secondary: #edf2f7;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --card-hover-bg: #f0f7ff;
+}
+
+.dark-theme {
+  --primary: #60a5fa;
+  --primary-dark: #3b82f6;
+  --primary-light: #bfdbfe;
+  --text: #f9fafb;
+  --text-light: #d1d5db;
+  --background: #111827;
+  --card-bg: #1f2937;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  --primary-text: #f8fafc;
+  --secondary-text: #cbd5e0;
+  --accent-color: #29b9e7;
+  --bg-primary: #1a202c;
+  --bg-secondary: #2d3748;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --card-hover-bg: #2b3b54;
+}
+
+/* Устранение горизонтального скролла */
+html, body {
+  overflow-x: hidden !important;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  position: relative;
+  -ms-overflow-style: none; /* IE и Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Скрыть скролл бар для Chrome, Safari и Opera */
+html::-webkit-scrollbar, 
+body::-webkit-scrollbar,
+.home::-webkit-scrollbar,
+.hero-section::-webkit-scrollbar,
+.stats-section::-webkit-scrollbar,
+.features-section::-webkit-scrollbar,
+.exhibits-section::-webkit-scrollbar,
+.how-section::-webkit-scrollbar,
+.cta-section::-webkit-scrollbar {
+  display: none;
+  width: 0 !important;
+}
+
+* {
+  box-sizing: border-box;
+  max-width: 100%;
+  -ms-overflow-style: none; /* IE и Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.home {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: var(--background);
+  color: var(--text);
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  -ms-overflow-style: none; /* IE и Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Исправление позиционирования секций */
+.hero-section,
+.stats-section,
+.features-section,
+.exhibits-section,
+.how-section,
+.cta-section {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  padding-left: 0;
+  padding-right: 0;
+  box-sizing: border-box;
+  -ms-overflow-style: none; /* IE и Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Фиксируем контейнеры по ширине */
+.stats-container, 
+.features-container, 
+.exhibits-grid,
+.steps-container,
+.section-header,
+.cta-content {
+  width: 100%;
+  max-width: 1200px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+/* Фиксируем размеры статистики на мобильных устройствах */
+@media (max-width: 576px) {
+  .stats-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  
+  .stat-item {
+    min-width: auto;
+    width: 100%;
+    padding: 1rem;
+  }
+  
+  .btn-primary, .btn-secondary, .btn-outline {
+    width: auto;
+    min-width: 0;
+    max-width: 100%;
+  }
+  
+  .hero-buttons {
+    flex-direction: column;
+    width: 100%;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.home-container {
+  background-color: var(--bg-primary);
+  transition: background-color 0.3s ease-in-out;
+}
+
+/* Герой-секция - Светлая версия */
+.hero-section {
+  position: relative;
+  height: 70vh;
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, #3b82f6, #60a5fa); /* Светлый синий градиент */
+  overflow: hidden;
+  padding: 0; /* Удаляем горизонтальные паддинги */
+}
+
+/* Скрываем обычный фон */
+.hero-background {
+  display: none;
+}
+
+/* Новый стиль оверлея - светлый и воздушный */
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.2), transparent 70%),
+              radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.2), transparent 70%);
+  z-index: 0;
+}
+
+/* Dark theme hero section */
+.dark-theme .hero-section {
+  background: linear-gradient(135deg, #2563eb, #3b82f6); /* Темнее синий градиент для темной темы */
+}
+
+.dark-theme .hero-overlay {
+  background: radial-gradient(circle at 20% 50%, rgba(219, 234, 254, 0.1), transparent 70%),
+              radial-gradient(circle at 80% 70%, rgba(191, 219, 254, 0.1), transparent 70%);
+}
+
+.dark-theme .hero-content {
+  background-color: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-theme .hero-content:hover {
+  background-color: rgba(15, 23, 42, 0.55);
+}
+
+.dark-theme .btn-primary {
+  background-color: #f8fafc;
+  color: #2563eb;
+}
+
+.dark-theme .btn-secondary {
+  background-color: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Стили для статистики */
+.dark-theme .stats-section {
+  box-shadow: 0 -20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.dark-theme .stat-item {
+  background-color: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(51, 65, 85, 0.6);
+}
+
+.dark-theme .stat-item:hover {
+  background-color: rgba(59, 130, 246, 0.15);
+  border-color: rgba(96, 165, 250, 0.4);
+}
+
+.dark-theme .stat-number {
+  background: linear-gradient(to right, #60a5fa, #93c5fd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Стили для контейнера с текстом */
+.hero-content {
+  max-width: 800px;
+  width: 90%;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  z-index: 1;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.hero-content:hover {
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15);
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-5px);
+}
+
+/* Dark theme for features section */
+.dark-theme .features-section::before {
+  background-image: radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+}
+
+.dark-theme .feature-card {
+  background-color: var(--card-bg);
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.dark-theme .feature-card:hover {
+  border-color: rgba(96, 165, 250, 0.4);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .feature-icon {
+  background-color: rgba(59, 130, 246, 0.2);
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.15);
+}
+
+/* Dark theme for exhibits section */
+.dark-theme .exhibits-section::before {
+  background: linear-gradient(180deg, var(--background) 0%, var(--card-bg) 100%);
+}
+
+.dark-theme .exhibit-card {
+  background-color: var(--card-bg);
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.dark-theme .exhibit-card:hover {
+  border-color: rgba(96, 165, 250, 0.4);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .exhibit-overlay {
+  background: rgba(37, 99, 235, 0.7);
+}
+
+.dark-theme .view-button {
+  background-color: #f8fafc;
+  color: #2563eb;
+}
+
+/* Dark theme for how-it-works section */
+.dark-theme .how-section::before {
+  background-image: radial-gradient(circle at 90% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+}
+
+.dark-theme .step-item {
+  background-color: var(--card-bg);
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.dark-theme .step-item:hover {
+  border-color: rgba(96, 165, 250, 0.4);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .step-number {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.25);
+}
+
+/* Dark theme for CTA section */
+.dark-theme .cta-section {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+}
+
+.dark-theme .cta-section::before {
+  background: radial-gradient(circle at 10% 20%, rgba(219, 234, 254, 0.1) 0%, rgba(219, 234, 254, 0) 70%);
+}
+
+.dark-theme .cta-section .btn-primary {
+  background-color: #f8fafc;
+  color: #2563eb;
+}
+
+/* Стили для заголовка */
+.hero-content h1 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: white;
+}
+
+.hero-title-line {
+  display: block;
+  font-size: 0.9em;
+  color: white;
+  margin-bottom: 0.2em;
+}
+
+.hero-title-highlight {
+  display: block;
+  font-size: 1.1em;
+  color: white;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Декоративный элемент */
+.hero-decoration {
+  position: relative;
+  height: 3px;
+  width: 80px;
+  background: linear-gradient(to right, transparent, white, transparent);
+  margin: 0 auto 1.5rem;
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+/* Стиль параграфа */
+.hero-content p {
+  font-size: 1.15rem;
+  margin-bottom: 2rem;
+  opacity: 0.95;
+  max-width: 650px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+  font-weight: 300;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Кнопки */
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 5;
+  margin-top: 1.5rem;
+}
+
+.btn-primary {
+  background-color: white;
+  color: #3b82f6;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #f8fafc;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.btn-secondary {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Адаптивные стили */
+@media (max-width: 768px) {
+  .hero-section {
+    height: 65vh;
+  }
+  
+  .hero-content {
+    padding: 2rem;
+  }
+  
+  .hero-content h1 {
+    font-size: 2.8rem;
+  }
+  
+  .btn-primary, .btn-secondary {
+    padding: 0.9rem 1.8rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-section {
+    height: 60vh;
+  }
+  
+  .hero-content {
+    padding: 1.5rem;
+  }
+  
+  .hero-content h1 {
+    font-size: 2.2rem;
+  }
+  
+  .hero-content p {
+    font-size: 1rem;
+  }
+}
+
+/* Секция статистики - светлая версия */
+.stats-section {
+  background-color: var(--card-bg);
+  padding: 4rem 0;
+  box-shadow: 0 -20px 40px rgba(0, 0, 0, 0.03);
+  margin-top: -70px;
+  position: relative;
+  z-index: 10;
+  border-radius: 24px 24px 0 0;
+}
+
+.stats-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 1.5rem 2rem;
+  min-width: 180px;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  background-color: rgba(59, 130, 246, 0.04);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+}
+
+.stat-item:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.06);
+  background-color: rgba(59, 130, 246, 0.06);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.stat-number {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+  display: block;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  background: linear-gradient(to right, #3b82f6, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stat-item p {
+  color: var(--text);
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Секция особенностей - светлая версия */
+.features-section {
+  padding: 6rem 0; /* Только вертикальные паддинги */
+  background-color: var(--background);
+  position: relative;
+  overflow: hidden;
+}
+
+.features-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
+  z-index: 0;
+}
+
+.section-header {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 4rem;
+  position: relative;
+  z-index: 2;
+}
+
+.section-header h2 {
+  font-size: 2.75rem;
+  margin-bottom: 1.25rem;
+  color: var(--text);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.section-header p {
+  color: var(--text-light);
+  font-size: 1.2rem;
+  line-height: 1.6;
+}
+
+.features-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.feature-card {
+  background-color: var(--card-bg);
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.feature-icon {
+  width: 70px;
+  height: 70px;
+  background-color: rgba(59, 130, 246, 0.1);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  color: var(--primary);
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.08);
+}
+
+.feature-card:hover .feature-icon {
+  background-color: var(--primary);
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 12px 24px rgba(59, 130, 246, 0.15);
+}
+
+.feature-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.feature-card p {
+  color: var(--text-light);
+  margin-bottom: 2rem;
+  flex-grow: 1;
+  line-height: 1.6;
+}
+
+.feature-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.feature-link:hover {
+  color: var(--primary-dark);
+  gap: 0.8rem;
+}
+
+/* Секция экспонатов - светлая версия */
+.exhibits-section {
+  padding: 6rem 0; /* Только вертикальные паддинги */
+  background-color: var(--card-bg);
+  position: relative;
+}
+
+.exhibits-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(180deg, var(--background) 0%, var(--card-bg) 100%);
+  z-index: 0;
+}
+
+.exhibits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.exhibit-card {
+  background-color: var(--card-bg);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.exhibit-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.exhibit-image {
+  position: relative;
+  height: 240px;
+  overflow: hidden;
+}
+
+.exhibit-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: all 0.5s ease;
+}
+
+.exhibit-card:hover .exhibit-image img {
+  transform: scale(1.1);
+}
+
+.exhibit-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(59, 130, 246, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(3px);
+}
+
+.exhibit-card:hover .exhibit-overlay {
+  opacity: 1;
+}
+
+.view-button {
+  background-color: white;
+  color: var(--primary);
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  transform: translateY(20px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.exhibit-card:hover .view-button {
+  transform: translateY(0);
+}
+
+.view-button:hover {
+  background-color: #f8fafc;
+  transform: scale(1.05);
+}
+
+.exhibit-content {
+  padding: 2rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.exhibit-category {
+  color: var(--primary);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  margin-bottom: 0.75rem;
+  background-color: rgba(59, 130, 246, 0.1);
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+}
+
+.exhibit-content h3 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  color: var(--text);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.exhibit-content p {
+  color: var(--text-light);
+  font-size: 1rem;
+  flex-grow: 1;
+  line-height: 1.6;
+}
+
+.view-all-button {
+  text-align: center;
+  margin-top: 4rem;
+  position: relative;
+  z-index: 1;
+}
+
+.view-all-button .btn-outline {
+  background-color: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.view-all-button .btn-outline:hover {
+  background-color: var(--primary);
+  color: white;
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.15);
+}
+
+/* Секция "Как это работает" - светлая версия */
+.how-section {
+  padding: 6rem 0; /* Только вертикальные паддинги */
+  background-color: var(--background);
+  position: relative;
+  overflow: hidden;
+}
+
+.how-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(circle at 90% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
+  z-index: 0;
+}
+
+.steps-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.step-item {
+  background-color: var(--card-bg);
+  border-radius: 16px;
+  padding: 2.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.step-item:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.step-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 100%;
+  background: linear-gradient(to bottom, #3b82f6, #60a5fa);
+  border-radius: 3px 0 0 3px;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.step-item:hover::before {
+  width: 10px;
+  opacity: 1;
+}
+
+.step-number {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.15);
+  transition: all 0.3s ease;
+}
+
+.step-number span {
+  color: white;
+  font-size: 2rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.step-item:hover .step-number {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 12px 24px rgba(59, 130, 246, 0.25);
+}
+
+.step-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  position: relative;
+}
+
+.step-item h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--text);
+  transition: all 0.3s ease;
+}
+
+.step-item:hover h3 {
+  color: var(--primary);
+}
+
+.step-item p {
+  color: var(--text-light);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  flex: 1;
+}
+
+/* Секция призыва к действию - светлая версия */
+.cta-section {
+  background: linear-gradient(135deg, #60a5fa, #93c5fd);
+  padding: 5rem 0; /* Только вертикальные паддинги */
+  color: white;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.05);
+  margin-top: 3rem;
+}
+
+.cta-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
+  z-index: 1;
+}
+
+.cta-content {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+  padding: 0 1rem;
+}
+
+.cta-content h2 {
+  font-size: 2.75rem;
+  margin-bottom: 1.25rem;
+  color: white;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.cta-content p {
+  font-size: 1.2rem;
+  margin-bottom: 2.5rem;
+  opacity: 0.95;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+.cta-section .btn-primary {
+  background-color: white;
+  color: #4c97fb;
+  padding: 1.1rem 2.5rem;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cta-section .btn-primary:hover {
+  background-color: #f8fafc;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+}
+
+/* Спиннер загрузки */
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 0;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(59, 130, 246, 0.15);
+  border-top: 4px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1.5rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-spinner p {
+  color: var(--text-light);
+  font-size: 1.1rem;
+}
+
+/* Анимации появления */
+.reveal {
+  position: relative;
+  opacity: 0;
+  transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.reveal.active {
+  opacity: 1;
+}
+
+.fade-bottom {
+  transform: translateY(70px);
+}
+
+.fade-bottom.active {
+  transform: translateY(0);
+}
+
+.fade-left {
+  transform: translateX(-70px);
+}
+
+.fade-left.active {
+  transform: translateX(0);
+}
+
+.fade-right {
+  transform: translateX(70px);
+}
+
+.fade-right.active {
+  transform: translateX(0);
+}
+
+.fade-up {
+  transform: translateY(50px);
+}
+
+.fade-up.active {
+  transform: translateY(0);
+}
+
+/* Дополнительные анимации при наведении */
+.feature-card, .exhibit-card, .step-item {
+  will-change: transform;
+}
+
+/* Адаптивность */
+@media (max-width: 992px) {
+  :root {
+    --border-radius-sm: 10px;
+    --border-radius-md: 14px;
+    --border-radius-lg: 18px;
+    --border-radius-xl: 24px;
+  }
+  
+  .hero-content h1 {
+    font-size: 3rem;
+  }
+  
+  .section-header h2, .cta-content h2 {
+    font-size: 2.2rem;
+  }
+  
+  .hero-title-highlight {
+    font-size: 3.5rem;
+  }
+  
+  .hero-shape {
+    filter: blur(30px);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    height: 65vh;
+  }
+  
+  .hero-content {
+    padding: 2rem;
+  }
+  
+  .hero-content h1 {
+    font-size: 2.8rem;
+  }
+  
+  .hero-title-highlight {
+    font-size: 1em;
+  }
+  
+  .btn-primary, .btn-secondary {
+    padding: 0.9rem 1.8rem;
+  }
+  
+  .hero-title-highlight {
+    font-size: 2.8rem;
+  }
+  
+  .feature-card, .step-item {
+    padding: 2rem;
+  }
+  
+  .exhibits-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+  
+  .stat-number {
+    font-size: 2.5rem;
+  }
+  
+  .feature-icon, .step-number {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  :root {
+    --border-radius-sm: 8px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 16px;
+    --border-radius-xl: 20px;
+  }
+  
+  .hero-section {
+    height: 60vh;
+  }
+  
+  .hero-content {
+    padding: 1.5rem;
+  }
+  
+  .hero-content h1 {
+    font-size: 2.2rem;
+  }
+  
+  .hero-content p {
+    font-size: 1rem;
+  }
+  
+  .hero-title-highlight {
+    font-size: 2.3rem;
+  }
+  
+  .hero-decoration {
+    width: 60px;
+    margin-top: 0.3rem;
+  }
+  
+  .stat-number {
+    font-size: 2.2rem;
+  }
+  
+  .btn-primary, .btn-secondary, .btn-outline {
+    width: 100%;
+    padding: 0.9rem 1.5rem;
+  }
+  
+  .exhibits-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .feature-icon, .step-number {
+    width: 50px;
+    height: 50px;
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .section-header h2, .cta-content h2 {
+    font-size: 2rem;
+  }
+  
+  .feature-card h3, .step-item h3 {
+    font-size: 1.3rem;
+  }
+}
+
+/* Reduced animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary:hover, .btn-secondary:hover, .exhibit-card:hover {
+    transform: none;
+  }
+  
+  .hero-section, .home-container, .exhibit-card {
+    transition: none;
+  }
+} 

@@ -1,0 +1,60 @@
+[
+  {
+    "id": 1,
+    "title": "История компьютеров",
+    "description": "Проверьте свои знания об истории вычислительной техники",
+    "image": "/uploads/quizzes/computer-history.jpg",
+    "category": "computers",
+    "questions": [
+      {
+        "id": 1,
+        "text": "Какая компания выпустила компьютер Macintosh в 1984 году?",
+        "options": ["Apple", "IBM", "Microsoft", "Commodore"],
+        "correctAnswer": 0
+      },
+      {
+        "id": 2,
+        "text": "Кто является соучредителем Microsoft?",
+        "options": ["Стив Джобс", "Билл Гейтс", "Марк Цукерберг", "Тим Кук"],
+        "correctAnswer": 1
+      },
+      {
+        "id": 3,
+        "text": "В каком году был выпущен первый iPhone?",
+        "options": ["2005", "2006", "2007", "2008"],
+        "correctAnswer": 2
+      }
+    ],
+    "createdAt": "2023-04-15T10:25:00.000Z",
+    "updatedAt": "2023-04-15T10:25:00.000Z"
+  },
+  {
+    "id": 2,
+    "title": "Мобильные телефоны 90-х и 2000-х",
+    "description": "Насколько хорошо вы помните телефоны ушедших эпох?",
+    "image": "/uploads/quizzes/mobile-phones.jpg",
+    "category": "phones",
+    "questions": [
+      {
+        "id": 1,
+        "text": "Какая компания выпустила знаменитый телефон 3310?",
+        "options": ["Samsung", "Motorola", "Nokia", "Siemens"],
+        "correctAnswer": 2
+      },
+      {
+        "id": 2,
+        "text": "Какая игра была предустановлена на большинстве телефонов Nokia?",
+        "options": ["Тетрис", "Змейка", "Пасьянс", "Арканоид"],
+        "correctAnswer": 1
+      },
+      {
+        "id": 3,
+        "text": "Какая операционная система использовалась в первых смартфонах BlackBerry?",
+        "options": ["Android", "iOS", "BlackBerry OS", "Windows Mobile"],
+        "correctAnswer": 2
+      }
+    ],
+    "createdAt": "2023-04-15T10:26:00.000Z",
+    "updatedAt": "2023-04-15T10:26:00.000Z"
+  }
+]

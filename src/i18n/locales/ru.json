@@ -1,0 +1,14 @@
+{
+  "navigation": {
+    "exhibits": "Экспонаты",
+    "quizzes": "Викторины",
+    "games": "Игры",
+    "about": "О нас",
+    "reviews": "Отзывы",
+    "admin": "Админ"
+  },
+  "header": {
+    "title": "Музей Онлайн",
+    "language": "Язык"
+  }
+} 

@@ -1,0 +1,35 @@
+[
+  {
+    "id": 1,
+    "name": "Анна Иванова",
+    "email": "anna@example.com",
+    "content": "Отличный музей! Очень интересная экспозиция, особенно понравился раздел с ретро компьютерами.",
+    "rating": 5,
+    "approved": true,
+    "image": "/uploads/reviews/review1.jpg",
+    "createdAt": "2023-04-15T10:25:00.000Z",
+    "updatedAt": "2023-04-15T10:25:00.000Z"
+  },
+  {
+    "id": 2,
+    "name": "Иван Петров",
+    "email": "ivan@example.com",
+    "content": "Было очень интересно увидеть эволюцию телефонов. Вспомнил свой первый мобильный!",
+    "rating": 4,
+    "approved": true,
+    "image": null,
+    "createdAt": "2023-04-15T10:26:00.000Z",
+    "updatedAt": "2023-04-15T10:26:00.000Z"
+  },
+  {
+    "id": 3,
+    "name": "Мария Сидорова",
+    "email": "maria@example.com",
+    "content": "Замечательное место! Дети были в восторге от интерактивных экспонатов.",
+    "rating": 5,
+    "approved": true,
+    "image": "/uploads/reviews/review3.jpg",
+    "createdAt": "2023-04-15T10:27:00.000Z",
+    "updatedAt": "2023-04-15T10:27:00.000Z"
+  }
+]

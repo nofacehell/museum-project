@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { fetchQuiz } from '../utils/api';
+import { FaCheck, FaTimes } from 'react-icons/fa';
 import '../styles/quiz.css';
-import { getQuizById } from '../utils/api';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
@@ -10,8 +11,9 @@ const QuizPage = () => {
   const navigate = useNavigate();
   const [quiz, setQuiz] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [isAnswerCorrect, setIsAnswerCorrect] = useState(null);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [isChecked, setIsChecked] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
   const [score, setScore] = useState(0);
   const [completed, setCompleted] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -21,13 +23,24 @@ const QuizPage = () => {
 
   // Загрузка данных викторины
   useEffect(() => {
+    console.log('QuizPage: Current quiz ID:', id);
+    
     const loadQuiz = async () => {
+      if (!id) {
+        console.error('QuizPage: No quiz ID provided');
+        setError('ID викторины не указан');
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null);
         
+        console.log('QuizPage: Fetching quiz with ID:', id);
         // Получаем викторину по ID через API
-        const quizData = await getQuizById(id);
+        const quizData = await fetchQuiz(id);
+        console.log('QuizPage: Received quiz data:', quizData);
         
         if (quizData) {
           setQuiz(quizData);
@@ -47,9 +60,7 @@ const QuizPage = () => {
       }
     };
 
-    if (id) {
-      loadQuiz();
-    }
+    loadQuiz();
     
     // Инициализация AOS (Animation On Scroll)
     AOS.init({
@@ -94,44 +105,29 @@ const QuizPage = () => {
     return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   };
 
-  const handleAnswerSelect = (answerIndex) => {
-    if (isAnswerCorrect !== null) return; // Не даем выбрать другой ответ после проверки
-    setSelectedAnswer(answerIndex);
+  const handleOptionSelect = (option) => {
+    if (!isChecked) {
+      setSelectedOption(option);
+    }
   };
 
   const checkAnswer = () => {
-    if (selectedAnswer === null) return;
-    
-    // Находим текущий вопрос
-    const currentQuestion = quiz.questions[currentQuestionIndex];
-    
-    // Проверяем, правильный ли ответ выбран
-    // API может возвращать правильный ответ в разных форматах:
-    // - либо как индекс правильного ответа в массиве options
-    // - либо как булевое значение isCorrect в каждом варианте ответа
-    let correct = false;
-    
-    if (typeof currentQuestion.correctAnswerIndex === 'number') {
-      // Если указан индекс правильного ответа
-      correct = selectedAnswer === currentQuestion.correctAnswerIndex;
-    } else if (Array.isArray(currentQuestion.options) && 
-               currentQuestion.options[selectedAnswer]?.isCorrect) {
-      // Если в опциях есть поле isCorrect
-      correct = currentQuestion.options[selectedAnswer].isCorrect;
-    }
-    
-    setIsAnswerCorrect(correct);
-    
-    if (correct) {
-      setScore(score + 1);
+    if (selectedOption !== null) {
+      const correct = selectedOption === quiz.questions[currentQuestionIndex].correctAnswer;
+      setIsCorrect(correct);
+      setIsChecked(true);
+      if (correct) {
+        setScore(score + 1);
+      }
     }
   };
 
   const goToNextQuestion = () => {
     if (currentQuestionIndex < quiz.questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedAnswer(null);
-      setIsAnswerCorrect(null);
+      setSelectedOption(null);
+      setIsChecked(false);
+      setIsCorrect(false);
     } else {
       setCompleted(true);
       setTimerActive(false); // Останавливаем таймер при завершении
@@ -140,8 +136,9 @@ const QuizPage = () => {
 
   const restartQuiz = () => {
     setCurrentQuestionIndex(0);
-    setSelectedAnswer(null);
-    setIsAnswerCorrect(null);
+    setSelectedOption(null);
+    setIsChecked(false);
+    setIsCorrect(false);
     setScore(0);
     setCompleted(false);
     
@@ -263,93 +260,92 @@ const QuizPage = () => {
   const currentQuestion = quiz.questions[currentQuestionIndex];
 
   return (
-    <div className="uk-container uk-container-small quiz-container">
+    <div className="quiz-container">
       <div className="quiz-card">
         <div className="quiz-header">
-          <h2 className="quiz-title">{quiz.title}</h2>
+          <h2>{quiz.title}</h2>
           <div className="quiz-progress">
-            <div 
-              className="quiz-progress-bar" 
-              style={{ width: `${((currentQuestionIndex) / quiz.questions.length) * 100}%` }}
-            ></div>
-          </div>
-          <div className="quiz-meta">
-            <span className="quiz-question-counter">
+            <div className="quiz-progress-bar">
+              <div 
+                className="progress-fill" 
+                style={{ width: `${((currentQuestionIndex) / quiz.questions.length) * 100}%` }}
+              ></div>
+            </div>
+            <span className="progress-text">
               Вопрос {currentQuestionIndex + 1} из {quiz.questions.length}
             </span>
-            {timeLeft > 0 && (
-              <span className={`quiz-timer ${timeLeft < 10 ? 'quiz-timer-warning' : ''}`}>
-                {formatTime(timeLeft)}
-              </span>
-            )}
           </div>
-        </div>
-        
-        <div className="quiz-question">
-          <h3 className="quiz-question-text">{currentQuestion.question}</h3>
-          
-          {currentQuestion.image && (
-            <div className="quiz-question-image-container">
-              <img 
-                src={currentQuestion.image} 
-                alt={`Иллюстрация к вопросу ${currentQuestionIndex + 1}`} 
-                className="quiz-question-image"
-              />
+          {timeLeft > 0 && (
+            <div className={`quiz-timer ${timeLeft < 10 ? 'warning' : ''}`}>
+              {formatTime(timeLeft)}
             </div>
           )}
-          
-          <div className="quiz-options">
-            {currentQuestion.options.map((option, index) => (
-              <div 
-                key={index}
-                className={`quiz-option ${selectedAnswer === index ? 'selected' : ''} ${
-                  isAnswerCorrect !== null && index === selectedAnswer 
-                    ? isAnswerCorrect 
-                      ? 'correct' 
-                      : 'incorrect' 
-                    : ''
-                }`}
-                onClick={() => handleAnswerSelect(index)}
-              >
-                <div className="quiz-option-letter">
-                  {String.fromCharCode(65 + index)}
-                </div>
-                <div className="quiz-option-text">
-                  {option.text || option}
-                </div>
-                {isAnswerCorrect !== null && index === selectedAnswer && (
-                  <div className="quiz-option-icon">
-                    {isAnswerCorrect 
-                      ? <span uk-icon="icon: check; ratio: 1.2"></span> 
-                      : <span uk-icon="icon: close; ratio: 1.2"></span>
-                    }
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
         </div>
-        
-        <div className="quiz-actions">
-          {isAnswerCorrect === null ? (
-            <button 
-              className="uk-button uk-button-primary uk-button-large"
-              disabled={selectedAnswer === null}
+
+        <div className="quiz-content">
+          <div className="quiz-question">
+            <h3>{currentQuestion.text || currentQuestion.question}</h3>
+            
+            {currentQuestion.image && (
+              <div className="question-image">
+                <img 
+                  src={currentQuestion.image} 
+                  alt="Изображение к вопросу" 
+                  className="question-img"
+                />
+              </div>
+            )}
+
+            <div className="options-grid">
+              {currentQuestion.options.map((option, index) => (
+                <button
+                  key={index}
+                  className={`option-button ${selectedOption === index ? 'selected' : ''} 
+                    ${isChecked ? (index === currentQuestion.correctAnswer ? 'correct' : 
+                      selectedOption === index ? 'incorrect' : '') : ''}`}
+                  onClick={() => handleOptionSelect(index)}
+                  disabled={isChecked}
+                >
+                  <span className="option-letter">{String.fromCharCode(65 + index)}</span>
+                  <span className="option-text">{option}</span>
+                  {isChecked && index === currentQuestion.correctAnswer && (
+                    <FaCheck className="result-icon correct" />
+                  )}
+                  {isChecked && selectedOption === index && index !== currentQuestion.correctAnswer && (
+                    <FaTimes className="result-icon incorrect" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="quiz-actions">
+            <button
+              className="check-answer-button"
               onClick={checkAnswer}
+              disabled={selectedOption === null || isChecked}
             >
-              Проверить ответ
+              {isChecked ? 'Ответ проверен' : 'Проверить ответ'}
             </button>
-          ) : (
-            <button 
-              className="uk-button uk-button-primary uk-button-large"
-              onClick={goToNextQuestion}
-            >
-              {currentQuestionIndex < quiz.questions.length - 1 
-                ? 'Следующий вопрос' 
-                : 'Завершить викторину'
-              }
-            </button>
-          )}
+
+            {isChecked && (
+              <div className={`result-message ${isCorrect ? 'correct' : 'incorrect'}`}>
+                {isCorrect ? 'Правильно! Молодец!' : 'Неправильно. Попробуйте еще раз!'}
+              </div>
+            )}
+
+            {isChecked && (
+              <button 
+                className="next-question-button"
+                onClick={goToNextQuestion}
+              >
+                {currentQuestionIndex < quiz.questions.length - 1 
+                  ? 'Следующий вопрос' 
+                  : 'Завершить викторину'
+                }
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -1,291 +1,250 @@
+// server/src/routes/exhibits.js
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { Exhibit } from '../models/index.js';
+import Exhibit from '../models/Exhibit.js';
 import { generateCategoryIcon } from '../utils/iconHelper.js';
+import { Category } from '../models/Category.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Ensure uploads directory exists in project root
+// ─── Настройка папки для загрузок ────────────────────────────────
 const uploadsDir = path.join(__dirname, '../../../uploads/exhibits');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
+fs.mkdirSync(uploadsDir, { recursive: true });
+
+// Настройка multer для загрузки файлов
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(__dirname, '../../../uploads/exhibits');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+// Создаём инстанс multer
+const uploadInstance = multer({ storage });
+
+// Функция для удаления старого изображения
+const deleteOldImage = async (imagePath) => {
+  if (!imagePath) return;
+  try {
+    const fullPath = path.join(__dirname, '../../../', imagePath.replace(/^\//, ''));
+    if (fs.existsSync(fullPath)) {
+      await fs.promises.unlink(fullPath);
+    }
+  } catch (error) {
+    console.error('Error deleting old image:', error);
+  }
+};
 
 const router = express.Router();
 
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadsDir);
-  },
-  filename: function (req, file, cb) {
-    // Генерируем уникальное имя файла
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
-    const ext = path.extname(file.originalname);
-    cb(null, `${uniqueSuffix}${ext}`);
-  }
-});
-
-const upload = multer({ 
-  storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
-  fileFilter: (req, file, cb) => {
-    const filetypes = /jpeg|jpg|png|gif|webp/;
-    const mimetype = filetypes.test(file.mimetype);
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    if (mimetype && extname) {
-      return cb(null, true);
-    }
-    cb(new Error("Только изображения разрешены к загрузке!"));
-  }
-});
-
-// GET all exhibits
+// ─── Получить все экспонаты ───────────────────────────────────────
 router.get('/', async (req, res) => {
   try {
-    let exhibits;
-    
-    if (req.dbConnected) {
-      exhibits = await Exhibit.findAll({
-        order: [['createdAt', 'DESC']]
-      });
-    } else {
-      exhibits = req.localDB.getAll('exhibits');
-    }
-    
+    const exhibits = await Exhibit.findAll({
+      include: [{
+        model: Category,
+        attributes: ['id', 'name']
+      }],
+      order: [['createdAt', 'DESC']]
+    });
     res.json(exhibits);
   } catch (error) {
-    console.error('Error getting exhibits:', error);
-    res.status(500).json({ message: 'Ошибка при получении экспонатов', error: error.message });
+    console.error('Error fetching exhibits:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// GET featured exhibits
+// ─── Избранные экспонаты ─────────────────────────────────────────
 router.get('/featured', async (req, res) => {
   try {
-    let exhibits;
-    
-    if (req.dbConnected) {
-      exhibits = await Exhibit.findAll({
-        where: { featured: true },
-        limit: 3
-      });
-    } else {
-      exhibits = req.localDB.getAll('exhibits').filter(e => e.featured).slice(0, 3);
-    }
-    
-    res.json(exhibits);
-  } catch (error) {
-    console.error('Error getting featured exhibits:', error);
-    res.status(500).json({ message: 'Ошибка при получении избранных экспонатов', error: error.message });
+    const data = req.dbConnected
+      ? await Exhibit.findAll({ where: { featured: true }, limit: 3 })
+      : (req.localDB.getAll('exhibits') || []).filter(e => e.featured).slice(0, 3);
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Ошибка при получении избранных экспонатов', error: err.message });
   }
 });
 
-// GET exhibits by category
+// ─── По категории ─────────────────────────────────────────────────
 router.get('/category/:category', async (req, res) => {
   try {
     const { category } = req.params;
-    let exhibits;
-    
-    if (req.dbConnected) {
-      exhibits = await Exhibit.findAll({
-        where: { category }
-      });
-    } else {
-      exhibits = req.localDB.getAll('exhibits').filter(e => e.category === category);
-    }
-    
-    res.json(exhibits);
-  } catch (error) {
-    console.error('Error getting exhibits by category:', error);
-    res.status(500).json({ message: 'Ошибка при получении экспонатов по категории', error: error.message });
+    const data = req.dbConnected
+      ? await Exhibit.findAll({ where: { category } })
+      : (req.localDB.getAll('exhibits') || []).filter(e => e.category === category);
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Ошибка при получении по категории', error: err.message });
   }
 });
 
-// GET exhibit by ID
+// ─── Восстановить дефолтные экспонаты ────────────────────────────
+router.get('/restore', async (_req, res) => {
+  try {
+    const ok = await restoreExhibits();
+    res.json({
+      success: true,
+      message: ok
+        ? 'Базовые экспонаты восстановлены успешно'
+        : 'Восстановление не требуется'
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Ошибка при восстановлении', error: err.message });
+  }
+});
+
+// ─── Пакетная загрузка ────────────────────────────────────────────
+router.post('/batch', async (req, res) => {
+  try {
+    const { exhibits } = req.body;
+    if (!Array.isArray(exhibits) || exhibits.length === 0) {
+      return res.status(400).json({ message: 'Нужен массив экспонатов' });
+    }
+    const created = [];
+    for (const item of exhibits) {
+      try {
+        const inst = await Exhibit.create(item);
+        created.push(inst);
+      } catch (e) {
+        console.error('Batch error:', e);
+      }
+    }
+    res.status(201).json({
+      message: `Создано ${created.length} из ${exhibits.length}`,
+      created
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Ошибка пакетного создания', error: err.message });
+  }
+});
+
+// ─── Конкретный экспонат ─────────────────────────────────────────
 router.get('/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    let exhibit;
-    
-    if (req.dbConnected) {
-      exhibit = await Exhibit.findByPk(id);
-    } else {
-      exhibit = req.localDB.getAll('exhibits').find(e => e._id === id || e.id === id);
-    }
-    
+    const exhibit = await Exhibit.findByPk(req.params.id, {
+      include: [{
+        model: Category,
+        attributes: ['id', 'name']
+      }]
+    });
     if (!exhibit) {
-      return res.status(404).json({ message: 'Экспонат не найден' });
+      return res.status(404).json({ error: 'Exhibit not found' });
     }
-    
     res.json(exhibit);
   } catch (error) {
-    console.error('Error getting exhibit by ID:', error);
-    res.status(500).json({ message: 'Ошибка при получении экспоната', error: error.message });
+    console.error('Error fetching exhibit:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// POST create new exhibit
-router.post('/', upload.single('image'), async (req, res) => {
+// Создать экспонат
+router.post('/', uploadInstance.fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'additionalImages', maxCount: 10 }
+]), async (req, res) => {
   try {
-    console.log('POST /exhibits - Request body:', req.body);
-    console.log('POST /exhibits - Uploaded file:', req.file);
-    
-    const {
-      title,
-      description,
-      category,
-      year,
-      manufacturer,
-      technicalSpecs,
-      historicalContext,
-      interestingFacts,
-      additionalImages
-    } = req.body;
-
-    // Process the uploaded image
-    let imagePath = '';
-    if (req.file) {
-      imagePath = `/uploads/exhibits/${req.file.filename}`;
-      console.log('Image uploaded successfully. Path:', imagePath);
-      console.log('Full file path:', req.file.path);
-    } else {
-      console.log('No image file uploaded');
-    }
-
-    const newExhibit = {
-      _id: uuidv4(),
-      title,
-      description,
-      category,
-      image: imagePath,
-      year: parseInt(year),
-      manufacturer,
-      technicalSpecs: JSON.parse(technicalSpecs || '{}'),
-      historicalContext,
-      interestingFacts: JSON.parse(interestingFacts || '[]'),
-      additionalImages: JSON.parse(additionalImages || '[]'),
-      categoryIcon: generateCategoryIcon(category),
-      featured: false,
-      createdAt: new Date(),
-      updatedAt: new Date()
+    console.log('=== POST /api/exhibits ===');
+    console.log('req.files:', req.files);
+    console.log('req.body:', req.body);
+    const exhibitData = {
+      ...req.body,
+      image: req.files.image ? `/uploads/exhibits/${req.files.image[0].filename}` : null,
+      technicalSpecs: req.body.technicalSpecs ? JSON.parse(req.body.technicalSpecs) : {},
+      additionalImages: req.files.additionalImages ? req.files.additionalImages.map(f => `/uploads/exhibits/${f.filename}`) : []
     };
 
-    console.log('Creating new exhibit with data:', newExhibit);
-
-    let result;
-    if (req.dbConnected) {
-      result = await Exhibit.create(newExhibit);
-    } else {
-      const exhibits = req.localDB.getAll('exhibits');
-      exhibits.push(newExhibit);
-      req.localDB.save('exhibits', exhibits);
-      result = newExhibit;
-    }
-
-    res.status(201).json(result);
+    const exhibit = await Exhibit.create(exhibitData);
+    res.status(201).json(exhibit);
   } catch (error) {
     console.error('Error creating exhibit:', error);
-    res.status(500).json({ message: 'Ошибка при создании экспоната', error: error.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// PUT update exhibit
-router.put('/:id', upload.single('image'), async (req, res) => {
+// Обновить экспонат
+router.put('/:id', uploadInstance.fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'additionalImages', maxCount: 10 }
+]), async (req, res) => {
   try {
-    const { id } = req.params;
-    const updateData = { ...req.body };
+    const exhibit = await Exhibit.findByPk(req.params.id);
+    if (!exhibit) {
+      return res.status(404).json({ error: 'Exhibit not found' });
+    }
 
-    // Process the uploaded image if exists
+    const exhibitData = {
+      ...req.body,
+      technicalSpecs: req.body.technicalSpecs ? JSON.parse(req.body.technicalSpecs) : exhibit.technicalSpecs,
+      additionalImages: req.body.additionalImages ? JSON.parse(req.body.additionalImages) : exhibit.additionalImages
+    };
+
     if (req.file) {
-      updateData.image = `/uploads/exhibits/${req.file.filename}`;
-      console.log('New image uploaded:', updateData.image);
-    } else {
-      console.log('No new image uploaded, keeping existing image');
-    }
-
-    // Parse JSON strings if provided
-    if (updateData.technicalSpecs) {
-      updateData.technicalSpecs = JSON.parse(updateData.technicalSpecs);
-    }
-    if (updateData.interestingFacts) {
-      updateData.interestingFacts = JSON.parse(updateData.interestingFacts);
-    }
-    if (updateData.additionalImages) {
-      updateData.additionalImages = JSON.parse(updateData.additionalImages);
-    }
-
-    updateData.updatedAt = new Date();
-
-    console.log('Updating exhibit with data:', updateData);
-
-    let updatedExhibit;
-    if (req.dbConnected) {
-      updatedExhibit = await Exhibit.findByPk(id);
-      if (updatedExhibit) {
-        await updatedExhibit.update(updateData);
+      // Удаляем старое изображение, если оно существует
+      if (exhibit.image) {
+        const oldImagePath = path.join(__dirname, '../../', exhibit.image);
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
       }
-    } else {
-      const exhibits = req.localDB.getAll('exhibits');
-      const index = exhibits.findIndex(e => e._id === id || e.id === id);
-      
-      if (index === -1) {
-        return res.status(404).json({ message: 'Экспонат не найден' });
-      }
-      
-      exhibits[index] = { ...exhibits[index], ...updateData };
-      req.localDB.save('exhibits', exhibits);
-      updatedExhibit = exhibits[index];
+      exhibitData.image = `/uploads/exhibits/${req.file.filename}`;
     }
 
-    if (!updatedExhibit) {
-      return res.status(404).json({ message: 'Экспонат не найден' });
-    }
-
-    res.json(updatedExhibit);
+    await exhibit.update(exhibitData);
+    res.json(exhibit);
   } catch (error) {
     console.error('Error updating exhibit:', error);
-    res.status(500).json({ message: 'Ошибка при обновлении экспоната', error: error.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// DELETE exhibit
+// ─── Удалить экспонат ────────────────────────────────────────────
 router.delete('/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    
-    if (req.dbConnected) {
-      // First find the exhibit to check if it exists
-      const exhibit = await Exhibit.findByPk(id);
-      
-      if (!exhibit) {
-        return res.status(404).json({ message: 'Экспонат не найден' });
-      }
-      
-      // Then destroy it
-      await exhibit.destroy();
-    } else {
-      const exhibits = req.localDB.getAll('exhibits');
-      const index = exhibits.findIndex(e => e._id === id || e.id === id);
-      
-      if (index === -1) {
-        return res.status(404).json({ message: 'Экспонат не найден' });
-      }
-      
-      exhibits.splice(index, 1);
-      req.localDB.save('exhibits', exhibits);
+    const exhibit = await Exhibit.findByPk(req.params.id);
+    if (!exhibit) {
+      return res.status(404).json({ error: 'Exhibit not found' });
     }
 
-    res.json({ message: 'Экспонат успешно удален' });
+    // Удаляем изображения
+    if (exhibit.image) {
+      const imagePath = path.join(__dirname, '../../', exhibit.image);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+    }
+
+    if (exhibit.additionalImages && exhibit.additionalImages.length > 0) {
+      exhibit.additionalImages.forEach(image => {
+        const imagePath = path.join(__dirname, '../../', image);
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
+      });
+    }
+
+    await exhibit.destroy();
+    res.json({ message: 'Exhibit deleted successfully' });
   } catch (error) {
     console.error('Error deleting exhibit:', error);
-    res.status(500).json({ message: 'Ошибка при удалении экспоната', error: error.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-export { router }; 
+export default router;

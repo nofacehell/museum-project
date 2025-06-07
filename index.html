@@ -5,9 +5,22 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Музей Онлайн</title>
-    <!-- Скрипт для обхода проблем с маршрутизацией -->
+    <!-- Safeguard script to prevent direct file requests -->
     <script>
-      // Улучшенный скрипт для обработки маршрутов админки с поддержкой хэш-навигации
+      // Block any attempt to directly load source files
+      (function() {
+        // Check if this is a direct request to a source file
+        if (window.location.pathname.match(/\/src\/.*\.jsx$/) || 
+            window.location.href.includes('/src/App.jsx')) {
+          console.error('Direct access to source files is not allowed');
+          window.location.href = '/';
+          return;
+        }
+      })();
+    </script>
+    <!-- Упрощенный скрипт для проверки админских маршрутов -->
+    <script>
+      // Упрощенный скрипт для проверки админских маршрутов
       (function() {
         console.log('[AdminRoutesScript] Инициализация v3.0 (hash mode)...');
         
@@ -39,226 +52,33 @@
         const debugId = 'admin-' + Math.random().toString(36).substring(2, 9);
         console.log('[AdminRoutesScript] ID сессии:', debugId);
         
-        // Если это маршрут /admin/dashboard и пользователь авторизован, 
-        // принудительно запускаем процесс создания Admin UI
-        if ((hash === '#/admin/dashboard' || path === '/admin/dashboard') && isAuthenticated) {
-          console.log('[AdminRoutesScript] Обнаружен dashboard, активируем административный интерфейс...');
-          
-          // Принудительно устанавливаем ключи авторизации
-          if (isAuthenticated) {
-            localStorage.setItem('isAdminAuthenticated', 'true');
-            localStorage.setItem('adminAuth', 'true');
-          }
-          
-          // Создаем контейнер и управляем видимостью при загрузке DOM
-          document.addEventListener('DOMContentLoaded', function() {
-            console.log('[AdminRoutesScript] DOM загружен, настройка интерфейса...');
+        // Сохраняем настройки в localStorage для использования в React
+        if (isAdminPath && isAuthenticated) {
+          localStorage.setItem('adminRouteActive', 'true');
+          localStorage.setItem('adminSessionId', debugId);
+        } else {
+          console.log('[AdminRoutesScript] Не требуется активация (не маршрут админки или не авторизован)');
+          localStorage.setItem('adminRouteActive', 'false');
+        }
+        
+        // Обработка общих ошибок Vite, чтобы избежать проблем с маршрутизацией
+        window.addEventListener('error', function(event) {
+          if (event.message && event.message.includes('Failed to load module script')) {
+            console.warn('[AdminRoutesScript] Ошибка загрузки модуля, возможно проблема с Vite');
             
-            // Скрываем header и footer
-            const hideHeaderFooter = () => {
-              const header = document.querySelector('header');
-              const footer = document.querySelector('footer');
-              
-              if (header) {
-                header.style.display = 'none';
-                console.log('[AdminRoutesScript] Header скрыт');
-              }
-              
-              if (footer) {
-                footer.style.display = 'none';
-                console.log('[AdminRoutesScript] Footer скрыт');
-              }
-            };
-            
-            // Создаем контейнер для админ панели
-            const createAdminContainer = () => {
-              // Если контейнер уже существует, не создаем его повторно
-              if (document.getElementById('admin-content')) {
-                console.log('[AdminRoutesScript] Контейнер admin-content уже существует');
-                return;
-              }
-              
-              // Очищаем основной контейнер
-              const rootElement = document.getElementById('root');
-              if (rootElement) {
-                console.log('[AdminRoutesScript] Подготовка root элемента');
-                
-                // Попытка очистить любые существующие элементы React
-                try {
-                  const mainElement = document.querySelector('main.uk-main');
-                  if (mainElement) {
-                    mainElement.style.display = 'none';
-                    console.log('[AdminRoutesScript] Скрыто основное содержимое');
-                  }
-                } catch (e) {
-                  console.warn('[AdminRoutesScript] Не удалось скрыть содержимое:', e);
-                }
-                
-                // Создаем контейнер для админки
-                const adminContent = document.createElement('div');
-                adminContent.id = 'admin-content';
-                adminContent.setAttribute('data-debug-id', debugId);
-                adminContent.setAttribute('data-page', 'dashboard');
-                adminContent.style.position = 'fixed';
-                adminContent.style.top = '0';
-                adminContent.style.left = '0';
-                adminContent.style.right = '0';
-                adminContent.style.bottom = '0';
-                adminContent.style.backgroundColor = '#FFFFFF';
-                adminContent.style.zIndex = '9999';
-                adminContent.style.overflow = 'auto';
-                
-                // Добавляем контейнер в body, чтобы он был вне обычного потока DOM
-                document.body.appendChild(adminContent);
-                console.log('[AdminRoutesScript] Создан контейнер admin-content', adminContent);
-                
-                // Добавляем стили
-                const style = document.createElement('style');
-                style.textContent = `
-                  #admin-content {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background-color: #F8FAFC;
-                    z-index: 9999;
-                    overflow: auto;
-                  }
-                  
-                  .dark-theme #admin-content {
-                    background-color: #0E1117;
-                    color: #FFFFFF;
-                  }
-                  
-                  /* Добавляем базовые стили для адаптивности */
-                  @media (max-width: 640px) {
-                    #admin-content {
-                      padding: 10px;
-                    }
-                  }
-                  
-                  /* Временно скрываем остальное содержимое */
-                  body > .uk-offcanvas-content {
-                    opacity: 0;
-                  }
-                `;
-                document.head.appendChild(style);
-                console.log('[AdminRoutesScript] Добавлены стили для admin-content');
-                
-                // В случае, если React не отрендерил контент, добавляем загрузочный индикатор
-                const loader = document.createElement('div');
-                loader.innerHTML = `
-                  <div style="
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    text-align: center;
-                  ">
-                    <div style="
-                      display: inline-block;
-                      width: 40px;
-                      height: 40px;
-                      border: 4px solid rgba(0,0,0,0.1);
-                      border-radius: 50%;
-                      border-top-color: #3490dc;
-                      animation: admin-spin 1s ease-in-out infinite;
-                    "></div>
-                    <div style="margin-top: 20px; font-family: system-ui, sans-serif;">
-                      Загрузка панели администратора...
-                    </div>
-                    <style>
-                      @keyframes admin-spin {
-                        to { transform: rotate(360deg); }
-                      }
-                    </style>
-                  </div>
-                `;
-                adminContent.appendChild(loader);
-              } else {
-                console.warn('[AdminRoutesScript] Не найден root элемент');
-              }
-            };
-            
-            // Функция проверки и применения изменений с повторными попытками
-            const setupAdmin = (attemptCount = 0) => {
-              hideHeaderFooter();
-              
-              if (attemptCount < 5) {
-                try {
-                  createAdminContainer();
-                  console.log('[AdminRoutesScript] Настройка завершена успешно');
-                } catch (err) {
-                  console.error('[AdminRoutesScript] Ошибка при настройке:', err);
-                  setTimeout(() => setupAdmin(attemptCount + 1), 100 * Math.pow(2, attemptCount));
-                }
-              } else {
-                console.error('[AdminRoutesScript] Превышено число попыток настройки');
-              }
-            };
-            
-            // Запуск настройки с небольшой задержкой для загрузки React
-            setTimeout(setupAdmin, 50);
-            
-            // Добавляем дополнительную проверку - если через 5 секунд контейнер всё еще пуст, 
-            // перезагружаем страницу, чтобы дать React еще одну попытку
+            // Показываем всплывающее уведомление, если UIkit доступен
             setTimeout(() => {
-              const adminContent = document.getElementById('admin-content');
-              if (adminContent && adminContent.children.length <= 1) {
-                console.warn('[AdminRoutesScript] Контейнер admin-content пуст, перезагружаем страницу...');
-                
-                // Принудительно сбрасываем React для нового рендеринга
-                if (typeof window.ReactDOM !== 'undefined' && typeof window.ReactDOM.unmountComponentAtNode === 'function') {
-                  try {
-                    window.ReactDOM.unmountComponentAtNode(document.getElementById('root'));
-                    console.log('[AdminRoutesScript] React был сброшен');
-                  } catch (e) {
-                    console.warn('[AdminRoutesScript] Не удалось сбросить React:', e);
-                  }
-                }
-                
-                // Создаем ссылку для ручного перехода
-                const manualLink = document.createElement('a');
-                manualLink.href = '#';
-                manualLink.textContent = 'Нажмите здесь, чтобы перейти в панель администратора';
-                manualLink.style.display = 'block';
-                manualLink.style.marginTop = '20px';
-                manualLink.style.textDecoration = 'underline';
-                manualLink.style.color = '#3490dc';
-                manualLink.onclick = function(e) {
-                  e.preventDefault();
-                  window.location.reload();
-                };
-                
-                adminContent.querySelector('div > div').appendChild(manualLink);
-                
-                // Показываем всплывающее уведомление, если UIkit доступен
                 if (typeof UIkit !== 'undefined') {
                   UIkit.notification({
-                    message: 'Проблема при загрузке панели администратора. Попробуйте обновить страницу.',
+                  message: 'Проблема при загрузке ресурсов. Попробуйте обновить страницу.',
                     status: 'warning',
                     pos: 'top-center',
                     timeout: 5000
                   });
                 }
-              }
-            }, 5000);
-          });
-        } else if (isAdminPath && isAuthenticated) {
-          console.log('[AdminRoutesScript] Обнаружен другой маршрут админки, подготовка интерфейса...');
-          
-          // Для других админ-маршрутов применяем те же настройки
-          document.addEventListener('DOMContentLoaded', function() {
-            // Скрываем header и footer
-            const header = document.querySelector('header');
-            const footer = document.querySelector('footer');
-            if (header) header.style.display = 'none';
-            if (footer) footer.style.display = 'none';
-          });
-        } else {
-          console.log('[AdminRoutesScript] Не требуется активация (не маршрут админки или не авторизован)');
-        }
+            }, 2000);
+          }
+        });
       })();
     </script>
   </head>

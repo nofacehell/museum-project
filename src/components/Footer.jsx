@@ -1,87 +1,40 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useTheme } from '../contexts/ThemeContext';
-import '../styles/footer.css';
+import { FaLandmark, FaEnvelope, FaChevronUp, FaGamepad, FaQuestionCircle, FaHome, FaUser, FaCommentAlt } from 'react-icons/fa';
+import './Footer.css';
 
 const Footer = () => {
-  const { theme } = useTheme();
-  
+  // Скролл наверх
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
   return (
-    <footer className={`footer-section ${theme}`}>
-      <div className="decorative-circle" style={{ top: '10%', left: '5%' }}></div>
-      <div className="decorative-circle" style={{ bottom: '20%', right: '10%' }}></div>
-      <div className="noise"></div>
+    <footer className="footer">
+      <div className="footer-simple">
+        <div className="footer-copyright">
+          © {new Date().getFullYear()} Виртуальный Музей
+        </div>
+        
+        <div className="footer-links">
+          <Link to="/"><FaHome /> Главная</Link>
+          <Link to="/exhibits"><FaLandmark /> Экспонаты</Link>
+          <Link to="/reviews"><FaCommentAlt /> Отзывы</Link>
+          <Link to="/quizzes"><FaQuestionCircle /> Викторины</Link>
+          <Link to="/games"><FaGamepad /> Игры</Link>
+          <Link to="/admin"><FaUser /> Админ</Link>
+        </div>
+        
+        <div className="footer-contact">
+          <a href="mailto:info@museum.ru"><FaEnvelope /> info@museum.by</a>
+        </div>
+      </div>
       
-      <div className="uk-container">
-        <div className="uk-grid-large uk-child-width-1-4@m uk-child-width-1-2@s" data-uk-grid>
-          {/* О музее */}
-          <div>
-            <h4>
-              <span className="uk-margin-small-right" data-uk-icon="icon: album"></span>
-              О музее
-            </h4>
-            <p className="uk-text-small">
-              Виртуальный музей искусств - это уникальное пространство, где классическое и современное искусство встречаются с цифровыми технологиями.
-            </p>
-          </div>
-
-          {/* Навигация */}
-          <div>
-            <h4>
-              <span className="uk-margin-small-right" data-uk-icon="icon: list"></span>
-              Навигация
-            </h4>
-            <ul className="uk-list">
-              <li><Link to="/exhibits" className="pulse-on-hover">Экспонаты</Link></li>
-              <li><Link to="/quizzes" className="pulse-on-hover">Викторины</Link></li>
-              <li><Link to="/games" className="pulse-on-hover">Игры</Link></li>
-              <li><Link to="/reviews" className="pulse-on-hover">Отзывы</Link></li>
-            </ul>
-          </div>
-
-          {/* Контакты */}
-          <div>
-            <h4>
-              <span className="uk-margin-small-right" data-uk-icon="icon: receiver"></span>
-              Контакты
-            </h4>
-            <ul className="uk-list">
-              <li>
-                <a href="mailto:info@museum.ru" className="uk-flex uk-flex-middle">
-                  <span className="uk-margin-small-right" data-uk-icon="icon: mail"></span>
-                  info@museum.ru
-                </a>
-              </li>
-              <li>
-                <a href="tel:+79991234567" className="uk-flex uk-flex-middle">
-                  <span className="uk-margin-small-right" data-uk-icon="icon: phone"></span>
-                  +7 (999) 123-45-67
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Социальные сети */}
-          <div>
-            <h4>
-              <span className="uk-margin-small-right" data-uk-icon="icon: social"></span>
-              Социальные сети
-            </h4>
-            <div className="uk-flex uk-flex-middle">
-              <a href="#" className="uk-icon-button uk-margin-small-right animated-icon" data-uk-icon="twitter"></a>
-              <a href="#" className="uk-icon-button uk-margin-small-right animated-icon" data-uk-icon="facebook"></a>
-              <a href="#" className="uk-icon-button uk-margin-small-right animated-icon" data-uk-icon="instagram"></a>
-              <a href="#" className="uk-icon-button animated-icon" data-uk-icon="youtube"></a>
-            </div>
-          </div>
-        </div>
-
-        <hr className="uk-divider-icon uk-margin-medium" />
-
-        <div className="uk-text-center uk-text-small">
-          <p>© 2024 Музей Онлайн. Все права защищены.</p>
-          <p>Создано с <span className="uk-margin-small-right" data-uk-icon="icon: heart"></span> для образования</p>
-        </div>
+      <div className="scroll-top" onClick={scrollToTop}>
+        <FaChevronUp />
       </div>
     </footer>
   );

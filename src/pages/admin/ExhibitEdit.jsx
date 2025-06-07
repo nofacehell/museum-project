@@ -1,317 +1,492 @@
+// 💅 Стилизованная форма создания/редактирования экспоната с адаптивной вёрсткой
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import UIkit from 'uikit';
-import { getExhibitById, createExhibit, updateExhibit } from '../../utils/api';
+import {
+  Box,
+  Button,
+  Container,
+  FormControl,
+  FormLabel,
+  Input,
+  Textarea,
+  VStack,
+  Heading,
+  useToast,
+  HStack,
+  IconButton,
+  Text,
+  Image,
+  Grid,
+  GridItem,
+  Select,
+} from '@chakra-ui/react';
+import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
+import {
+  getExhibitById,
+  createExhibit,
+  updateExhibit,
+  getCategories
+} from '../../utils/api';
+import { getStaticUrl } from '../../utils/config';
+import 'uikit/dist/css/uikit.min.css';
 
 const ExhibitEdit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const toast = useToast();
+  const isNew = !id || id === 'new';
+
   const [exhibit, setExhibit] = useState({
     title: '',
-    category: 'Компьютеры',
+    categoryId: '',
     description: '',
     shortDescription: '',
-    image: '',
     year: '',
     manufacturer: '',
-    technicalSpecs: {},
     historicalContext: '',
-    additionalImages: []
+    technicalSpecs: {},
+    additionalImages: [],
+    image: null
   });
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(!isNew);
+  const [loadingCats, setLoadingCats] = useState(true);
   const [imageFile, setImageFile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const isNewExhibit = id === 'new' || !id;
+  const [additionalFiles, setAdditionalFiles] = useState([]);
+  const [technicalSpecKey, setTechnicalSpecKey] = useState('');
+  const [technicalSpecValue, setTechnicalSpecValue] = useState('');
+  const [interestingFact, setInterestingFact] = useState('');
 
   useEffect(() => {
-    if (isNewExhibit) {
-      setLoading(false);
-      return;
-    }
-
-    const loadExhibit = async () => {
+    const loadCategories = async () => {
       try {
-        setLoading(true);
-        const foundExhibit = await getExhibitById(id);
-        
-        if (!foundExhibit) {
-          setError('Экспонат не найден');
-          setLoading(false);
-          return;
-        }
-
-        // Ensure text fields are never null
-        const sanitizedExhibit = {
-          ...foundExhibit,
-          description: foundExhibit.description || '',
-          shortDescription: foundExhibit.shortDescription || '',
-          historicalContext: foundExhibit.historicalContext || '',
-          year: foundExhibit.year || '',
-          manufacturer: foundExhibit.manufacturer || ''
-        };
-
-        setExhibit(sanitizedExhibit);
-        setLoading(false);
+        const data = await getCategories();
+        setCategories(data);
+        setLoadingCats(false);
       } catch (err) {
-        console.error("ExhibitEdit: Ошибка при загрузке:", err);
-        setError('Ошибка при загрузке экспоната');
-        setLoading(false);
+        console.error('Error loading categories:', err);
+        toast({
+          title: 'Ошибка',
+          description: 'Не удалось загрузить категории',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
       }
     };
 
-    loadExhibit();
-  }, [id, isNewExhibit]);
+    loadCategories();
+  }, [toast]);
+
+  useEffect(() => {
+    if (!isNew) {
+      const loadExhibit = async () => {
+        try {
+          const data = await getExhibitById(id);
+          console.log('Exhibit from API:', data);
+          let additionalImages = [];
+          if (typeof data.additionalImages === 'string') {
+            try {
+              additionalImages = JSON.parse(data.additionalImages);
+            } catch (e) {
+              additionalImages = [];
+            }
+          } else if (Array.isArray(data.additionalImages)) {
+            additionalImages = data.additionalImages;
+          } else {
+            additionalImages = [];
+          }
+          let technicalSpecs = {};
+          if (typeof data.technicalSpecs === 'string') {
+            try {
+              technicalSpecs = JSON.parse(data.technicalSpecs);
+            } catch (e) {
+              technicalSpecs = {};
+            }
+          } else if (typeof data.technicalSpecs === 'object' && data.technicalSpecs !== null) {
+            technicalSpecs = data.technicalSpecs;
+          } else {
+            technicalSpecs = {};
+          }
+          setExhibit({
+            ...data,
+            additionalImages,
+            technicalSpecs,
+          });
+          setLoading(false);
+        } catch (err) {
+          console.error('Error loading exhibit:', err);
+          toast({
+            title: 'Ошибка',
+            description: 'Не удалось загрузить экспонат',
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+          });
+        }
+      };
+
+      loadExhibit();
+    }
+  }, [id, isNew, toast]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setExhibit(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleFile = e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    setImageFile(f);
+    setExhibit(prev => ({ ...prev, image: URL.createObjectURL(f) }));
+  };
+
+  const handleAdditionalFiles = e => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    setAdditionalFiles(prev => [...prev, ...files]);
+    const newImages = files.map(file => URL.createObjectURL(file));
+    setExhibit(prev => ({
+      ...prev,
+      additionalImages: [...(prev.additionalImages || []), ...newImages]
+    }));
+  };
+
+  const handleRemoveAdditionalImage = index => {
+    setExhibit(prev => ({
+      ...prev,
+      additionalImages: prev.additionalImages.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleTechnicalSpecChange = (index, field, value) => {
+    const specs = { ...exhibit.technicalSpecs };
+    const entries = Object.entries(specs);
+    const newEntries = entries.map((entry, i) => {
+      if (i === index) {
+        return field === 'key' ? [value, entry[1]] : [entry[0], value];
+      }
+      return entry;
+    });
+    setExhibit(prev => ({
+      ...prev,
+      technicalSpecs: Object.fromEntries(newEntries)
+    }));
+  };
+
+  const handleAddTechnicalSpec = () => {
+    if (technicalSpecKey && technicalSpecValue) {
+      setExhibit(prev => ({
+        ...prev,
+        technicalSpecs: {
+          ...prev.technicalSpecs,
+          [technicalSpecKey]: technicalSpecValue,
+        },
+      }));
+      setTechnicalSpecKey('');
+      setTechnicalSpecValue('');
+    }
+  };
+
+  const handleRemoveTechnicalSpec = key => {
+    setExhibit(prev => {
+      const newSpecs = { ...prev.technicalSpecs };
+      delete newSpecs[key];
+      return {
+        ...prev,
+        technicalSpecs: newSpecs,
+      };
+    });
+  };
+
+  const handleAddInterestingFact = () => {
+    if (interestingFact) {
+      setExhibit(prev => ({
+        ...prev,
+        interestingFacts: [...prev.interestingFacts, interestingFact],
+      }));
+      setInterestingFact('');
+    }
+  };
+
+  const handleRemoveInterestingFact = index => {
+    setExhibit(prev => ({
+      ...prev,
+      interestingFacts: prev.interestingFacts.filter((_, i) => i !== index),
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     try {
-      const formData = new FormData();
-      
-      // Добавляем все поля экспоната в FormData
-      Object.keys(exhibit).forEach(key => {
-        if (key === 'technicalSpecs' || key === 'additionalImages') {
-          formData.append(key, JSON.stringify(exhibit[key]));
-        } else if (key !== 'image') {
-          formData.append(key, exhibit[key]);
-        }
-      });
-      
-      // Добавляем файл изображения, если он есть
-      if (imageFile) {
-        console.log('Adding image file to FormData:', imageFile);
-        formData.append('image', imageFile);
-      }
-      
-      // Log FormData contents for debugging
-      for (let pair of formData.entries()) {
-        console.log('FormData entry:', pair[0], pair[1]);
-      }
-      
-      let result;
-      if (isNewExhibit) {
-        result = await createExhibit(formData);
-        
-        UIkit.notification({
-          message: 'Экспонат успешно создан',
+      const exhibitToSend = {
+        ...exhibit,
+        technicalSpecs: JSON.stringify(exhibit.technicalSpecs),
+      };
+      if (isNew) {
+        await createExhibit(exhibitToSend);
+        toast({
+          title: 'Успех',
+          description: 'Экспонат успешно создан',
           status: 'success',
-          pos: 'top-center',
-          timeout: 3000
+          duration: 5000,
+          isClosable: true,
         });
       } else {
-        result = await updateExhibit(id, formData);
-        
-        UIkit.notification({
-          message: 'Экспонат успешно обновлен',
+        await updateExhibit(id, exhibitToSend);
+        toast({
+          title: 'Успех',
+          description: 'Экспонат успешно обновлен',
           status: 'success',
-          pos: 'top-center',
-          timeout: 3000
+          duration: 5000,
+          isClosable: true,
         });
       }
-      
-      navigate('/admin/dashboard');
+      navigate('/admin/exhibits');
     } catch (err) {
-      console.error("ExhibitEdit: Ошибка при сохранении:", err);
-      UIkit.notification({
-        message: 'Ошибка при сохранении экспоната: ' + (err.response?.data?.message || err.message),
-        status: 'danger',
-        pos: 'top-center',
-        timeout: 3000
+      console.error('Error saving exhibit:', err);
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось сохранить экспонат',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
       });
     }
   };
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImageFile(file);
-      // Создаем URL для предпросмотра
-      const previewUrl = URL.createObjectURL(file);
-      setExhibit(prev => ({ ...prev, image: previewUrl }));
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="uk-container">
-        <div className="uk-text-center">
-          <div className="uk-spinner" data-uk-spinner="ratio: 2"></div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="uk-container">
-        <div className="uk-alert uk-alert-danger">
-          <p>{error}</p>
-        </div>
-        <button 
-          className="uk-button uk-button-default" 
-          onClick={() => navigate('/admin/dashboard')}
-        >
-          Вернуться в панель администратора
-        </button>
-      </div>
-    );
+  if (loading || loadingCats) {
+    return <Box p={4}>Загрузка...</Box>;
   }
 
   return (
-    <div className="uk-container">
-      <h1 className="uk-heading-medium">
-        {isNewExhibit ? 'Создание нового экспоната' : 'Редактирование экспоната'}
-      </h1>
-      
-      <form onSubmit={handleSubmit} className="uk-form-stacked">
-        <div className="uk-margin">
-          <label className="uk-form-label" htmlFor="title">Название экспоната</label>
-          <div className="uk-form-controls">
-            <input
-              className="uk-input"
-              id="title"
-              type="text"
-              value={exhibit.title}
-              onChange={(e) => setExhibit({ ...exhibit, title: e.target.value })}
-              required
-            />
-          </div>
-        </div>
+    <Container maxW="container.xl" py={8}>
+      <VStack spacing={8} align="stretch">
+        <Heading size="xl">{isNew ? 'Создание экспоната' : 'Редактирование экспоната'}</Heading>
+        
+        <form onSubmit={handleSubmit}>
+          <VStack spacing={6} align="stretch">
+            <FormControl isRequired>
+              <FormLabel>Название</FormLabel>
+              <Input
+                name="title"
+                value={exhibit.title}
+                onChange={handleInputChange}
+                placeholder="Введите название экспоната"
+              />
+            </FormControl>
 
-        <div className="uk-margin">
-          <label className="uk-form-label" htmlFor="shortDescription">Краткое описание</label>
-          <div className="uk-form-controls">
-            <textarea
-              className="uk-textarea"
-              id="shortDescription"
-              rows="2"
-              value={exhibit.shortDescription || ''}
-              onChange={(e) => setExhibit({ ...exhibit, shortDescription: e.target.value })}
-              required
-            />
-          </div>
-        </div>
+            <FormControl isRequired>
+              <FormLabel>Категория</FormLabel>
+              <Select
+                name="categoryId"
+                value={exhibit.categoryId}
+                onChange={handleInputChange}
+                placeholder="Выберите категорию"
+              >
+                {categories.map(category => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
 
-        <div className="uk-margin">
-          <label className="uk-form-label" htmlFor="description">Полное описание</label>
-          <div className="uk-form-controls">
-            <textarea
-              className="uk-textarea"
-              id="description"
-              rows="5"
-              value={exhibit.description || ''}
-              onChange={(e) => setExhibit({ ...exhibit, description: e.target.value })}
-              required
-            />
-          </div>
-        </div>
+            <FormControl isRequired>
+              <FormLabel>Описание</FormLabel>
+              <Textarea
+                name="description"
+                value={exhibit.description}
+                onChange={handleInputChange}
+                placeholder="Введите описание экспоната"
+                rows={4}
+              />
+            </FormControl>
 
-        <div className="uk-margin">
-          <label className="uk-form-label" htmlFor="category">Категория</label>
-          <div className="uk-form-controls">
-            <select
-              className="uk-select"
-              id="category"
-              value={exhibit.category}
-              onChange={(e) => setExhibit({ ...exhibit, category: e.target.value })}
-              required
-            >
-              <option value="Компьютеры">Компьютеры</option>
-              <option value="Аудиотехника">Аудиотехника</option>
-              <option value="Телефоны">Телефоны</option>
-              <option value="Игровые консоли">Игровые консоли</option>
-              <option value="Другое">Другое</option>
-            </select>
-          </div>
-        </div>
+            <FormControl isRequired>
+              <FormLabel>Краткое описание</FormLabel>
+              <Textarea
+                name="shortDescription"
+                value={exhibit.shortDescription}
+                onChange={handleInputChange}
+                placeholder="Введите краткое описание"
+                rows={2}
+              />
+            </FormControl>
 
-        <div className="uk-margin">
-          <label className="uk-form-label" htmlFor="year">Год</label>
-          <div className="uk-form-controls">
-            <input
-              className="uk-input"
-              id="year"
-              type="text"
-              value={exhibit.year || ''}
-              onChange={(e) => setExhibit({ ...exhibit, year: e.target.value })}
-              required
-            />
-          </div>
-        </div>
+            <FormControl isRequired>
+              <FormLabel>Год</FormLabel>
+              <Input
+                name="year"
+                value={exhibit.year}
+                onChange={handleInputChange}
+                placeholder="Введите год"
+              />
+            </FormControl>
 
-        <div className="uk-margin">
-          <label className="uk-form-label" htmlFor="manufacturer">Производитель</label>
-          <div className="uk-form-controls">
-            <input
-              className="uk-input"
-              id="manufacturer"
-              type="text"
-              value={exhibit.manufacturer || ''}
-              onChange={(e) => setExhibit({ ...exhibit, manufacturer: e.target.value })}
-              required
-            />
-          </div>
-        </div>
+            <FormControl isRequired>
+              <FormLabel>Производитель</FormLabel>
+              <Input
+                name="manufacturer"
+                value={exhibit.manufacturer}
+                onChange={handleInputChange}
+                placeholder="Введите производителя"
+              />
+            </FormControl>
 
-        <div className="uk-margin">
-          <label className="uk-form-label" htmlFor="image">Изображение</label>
-          <div className="uk-form-controls">
-            <div className="uk-margin" uk-margin="true">
-              <div uk-form-custom="target: true">
-                <input 
-                  type="file" 
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  required={isNewExhibit}
-                />
-                <input 
-                  className="uk-input uk-form-width-medium" 
-                  type="text" 
-                  placeholder="Выберите изображение" 
-                  disabled
-                />
-              </div>
+            <FormControl>
+              <FormLabel>Исторический контекст</FormLabel>
+              <Textarea
+                name="historicalContext"
+                value={exhibit.historicalContext}
+                onChange={handleInputChange}
+                placeholder="Введите исторический контекст"
+                rows={4}
+              />
+            </FormControl>
+
+            <FormControl isRequired>
+              <FormLabel>Основное изображение</FormLabel>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleFile}
+              />
               {exhibit.image && (
-                <div className="uk-margin">
-                  <img 
-                    src={exhibit.image} 
-                    alt="Preview" 
-                    style={{ maxWidth: '200px', maxHeight: '200px' }}
+                <Box mt={2}>
+                  <Image
+                    src={
+                      exhibit.image.startsWith('blob:') || exhibit.image.startsWith('http')
+                        ? exhibit.image
+                        : getStaticUrl(exhibit.image)
+                    }
+                    alt="Preview"
+                    maxH="200px"
+                    objectFit="contain"
                   />
-                </div>
+                </Box>
               )}
-            </div>
-          </div>
-        </div>
+            </FormControl>
 
-        <div className="uk-margin">
-          <label className="uk-form-label" htmlFor="historicalContext">Исторический контекст</label>
-          <div className="uk-form-controls">
-            <textarea
-              className="uk-textarea"
-              id="historicalContext"
-              rows="3"
-              value={exhibit.historicalContext || ''}
-              onChange={(e) => setExhibit({ ...exhibit, historicalContext: e.target.value })}
-            />
-          </div>
-        </div>
+            <FormControl>
+              <FormLabel>Дополнительные изображения</FormLabel>
+              <Input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleAdditionalFiles}
+              />
+              {exhibit.additionalImages.length > 0 && (
+                <Grid templateColumns="repeat(3, 1fr)" gap={2} mt={2}>
+                  {exhibit.additionalImages.map((image, index) => (
+                    <Box key={index} position="relative">
+                      <Image
+                        src={
+                          image.startsWith('blob:') || image.startsWith('http')
+                            ? image
+                            : getStaticUrl(image)
+                        }
+                        alt={`Preview ${index + 1}`}
+                        maxH="100px"
+                        objectFit="cover"
+                      />
+                      <IconButton
+                        icon={<DeleteIcon />}
+                        size="sm"
+                        colorScheme="red"
+                        position="absolute"
+                        top={1}
+                        right={1}
+                        onClick={() => handleRemoveAdditionalImage(index)}
+                      />
+                    </Box>
+                  ))}
+                </Grid>
+              )}
+            </FormControl>
 
-        <div className="uk-margin">
-          <button type="submit" className="uk-button uk-button-primary">
-            {isNewExhibit ? 'Создать экспонат' : 'Сохранить изменения'}
-          </button>
-          <button 
-            type="button" 
-            className="uk-button uk-button-default uk-margin-left"
-            onClick={() => navigate('/admin/dashboard')}
-          >
-            Отмена
-          </button>
-        </div>
-      </form>
-    </div>
+            <FormControl>
+              <FormLabel>Технические характеристики</FormLabel>
+              <HStack>
+                <Input
+                  placeholder="Название"
+                  value={technicalSpecKey}
+                  onChange={(e) => setTechnicalSpecKey(e.target.value)}
+                />
+                <Input
+                  placeholder="Значение"
+                  value={technicalSpecValue}
+                  onChange={(e) => setTechnicalSpecValue(e.target.value)}
+                />
+                <IconButton
+                  icon={<AddIcon />}
+                  onClick={handleAddTechnicalSpec}
+                  colorScheme="blue"
+                />
+              </HStack>
+              {Object.entries(exhibit.technicalSpecs).length > 0 && (
+                <VStack align="stretch" mt={2}>
+                  {Object.entries(exhibit.technicalSpecs).map(([key, value]) => (
+                    <HStack key={key} justify="space-between">
+                      <Text>
+                        <strong>{key}:</strong> {value}
+                      </Text>
+                      <IconButton
+                        icon={<DeleteIcon />}
+                        size="sm"
+                        colorScheme="red"
+                        onClick={() => handleRemoveTechnicalSpec(key)}
+                      />
+                    </HStack>
+                  ))}
+                </VStack>
+              )}
+            </FormControl>
+
+            <FormControl>
+              <FormLabel>Интересные факты</FormLabel>
+              <HStack>
+                <Input
+                  placeholder="Добавить интересный факт"
+                  value={interestingFact}
+                  onChange={(e) => setInterestingFact(e.target.value)}
+                />
+                <IconButton
+                  icon={<AddIcon />}
+                  onClick={handleAddInterestingFact}
+                  colorScheme="blue"
+                />
+              </HStack>
+              {exhibit.interestingFacts.length > 0 && (
+                <VStack align="stretch" mt={2}>
+                  {exhibit.interestingFacts.map((fact, index) => (
+                    <HStack key={index} justify="space-between">
+                      <Text>{fact}</Text>
+                      <IconButton
+                        icon={<DeleteIcon />}
+                        size="sm"
+                        colorScheme="red"
+                        onClick={() => handleRemoveInterestingFact(index)}
+                      />
+                    </HStack>
+                  ))}
+                </VStack>
+              )}
+            </FormControl>
+
+            <Button type="submit" colorScheme="blue" size="lg">
+              {isNew ? 'Создать' : 'Сохранить'}
+            </Button>
+          </VStack>
+        </form>
+      </VStack>
+    </Container>
   );
 };
 
-export default ExhibitEdit; 
+export default ExhibitEdit;

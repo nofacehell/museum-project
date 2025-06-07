@@ -1,140 +1,250 @@
+// server/src/server.js
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { connectDB } from './config/sequelize.js';
-import { seedDatabase } from './models/index.js';
-import { router } from './routes/exhibits.js';
-import quizRoutes from './routes/quizzes.js';
-import gameRoutes from './routes/games.js';
-import reviewRoutes from './routes/reviews.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import winston from 'winston';
+import multer from 'multer';
 
-// Определяем __dirname и __filename для ES модулей
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { connectDB } from './config/sequelize.js';
+import { seedDatabase } from './models/index.js';
+import { handleImageError } from './utils/image-handler.js';
+import { startAutoBackup } from './scripts/auto-backup.js';
 
-// Загружаем переменные среды из .env файла
+import exhibitsRouter   from './routes/exhibits.js';
+import quizzesRouter    from './routes/quizzes.js';
+import gamesRouter      from './routes/games.js';
+import reviewsRouter    from './routes/reviews.js';
+import categoriesRouter from './routes/categories.js';
+import authRouter       from './routes/auth.js';
+import usersRouter      from './routes/users.js';
+import ticketsRouter    from './routes/tickets.js';
+import eventsRouter     from './routes/events.js';
+import adminBackupRouter from './routes/admin-backup.js';
+
 dotenv.config();
 
-// Создаем экземпляр Express приложения
+// Принудительное использование локального хранилища (для отладки)
+const FORCE_LOCAL_STORAGE = process.env.FORCE_LOCAL_STORAGE === 'true';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
-// Применяем middleware
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+// =========== LOGGING ===========
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.File({ filename: 'src/server/server.log' })
+  ]
+});
 
-// Path for local storage in case DB is unavailable
-const DATA_DIR = path.join(__dirname, 'data');
-
-// Ensure data directory exists
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+// Добавляем консольный вывод логов для разработки
+if (process.env.NODE_ENV !== 'production') {
+  logger.add(new winston.transports.Console({
+    format: winston.format.combine(
+      winston.format.colorize(),
+      winston.format.simple()
+    )
+  }));
 }
 
-// Local storage functions
+// =========== CORS ===========
+app.use(cors({
+  origin: true, // Allow all origins in development
+  credentials: true
+}));
+
+// =========== BODY PARSERS ===========
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// =========== LOCAL FALLBACK STORAGE ===========
+const DATA_DIR = path.join(__dirname, 'data');
+fs.mkdirSync(DATA_DIR, { recursive: true });
 const localDB = {
-  getAll: (collection) => {
-    const filePath = path.join(DATA_DIR, `${collection}.json`);
-    if (fs.existsSync(filePath)) {
-      return JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    }
-    return [];
+  getAll: col => {
+    const f = path.join(DATA_DIR, `${col}.json`);
+    return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : [];
   },
-  save: (collection, data) => {
-    const filePath = path.join(DATA_DIR, `${collection}.json`);
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+  save: (col, data) => {
+    const f = path.join(DATA_DIR, `${col}.json`);
+    fs.writeFileSync(f, JSON.stringify(data, null, 2));
+  },
+  addItem: (col, item) => {
+    const all = localDB.getAll(col);
+    const id = all.length ? Math.max(...all.map(i => i.id || 0)) + 1 : 1;
+    const newItem = { id, ...item };
+    all.push(newItem);
+    localDB.save(col, all);
+    return newItem;
+  },
+  updateItem: (col, id, data) => {
+    const all = localDB.getAll(col);
+    const idx = all.findIndex(i => String(i.id) === String(id));
+    if (idx === -1) return null;
+    all[idx] = { ...all[idx], ...data };
+    localDB.save(col, all);
+    return all[idx];
+  },
+  deleteItem: (col, id) => {
+    const all = localDB.getAll(col);
+    const idx = all.findIndex(i => String(i.id) === String(id));
+    if (idx === -1) return false;
+    all.splice(idx, 1);
+    localDB.save(col, all);
+    return true;
   }
 };
 
-// Подключаемся к базе данных
-connectDB().then(() => {
-  console.log('✅ База данных подключена');
-  // Заполняем базу данных начальными данными
-  seedDatabase().then(() => {
-    console.log('✅ База данных заполнена начальными данными');
-  }).catch(error => {
-    console.error('❌ Ошибка при заполнении базы данных:', error);
+// =========== ПРОВЕРКА ЛОКАЛЬНЫХ ДАННЫХ ===========
+// Проверяем наличие локальных данных и логируем результаты
+const checkLocalData = () => {
+  console.log('\n🔍 Проверка локальных данных:');
+  const collections = ['exhibits', 'categories', 'quizzes', 'games', 'reviews'];
+  
+  collections.forEach(col => {
+    const data = localDB.getAll(col);
+    console.log(`📁 ${col}: ${data.length} записей`);
   });
-}).catch(error => {
-  console.error('❌ Ошибка подключения к базе данных:', error);
-});
+  console.log('\n');
+};
 
-// Add local DB to request
-app.use((req, res, next) => {
-  req.dbConnected = true;
+// Сразу проверяем локальные данные при запуске
+checkLocalData();
+
+// Глобальная переменная для хранения состояния подключения к БД
+let isDBConnected = false;
+
+// Функция для проверки подключения к БД
+connectDB()
+  .then((connected) => {
+    isDBConnected = connected && !FORCE_LOCAL_STORAGE;
+    
+    console.log(`✅ База данных ${connected ? 'подключена' : 'не подключена'}`);
+    console.log(`🔧 Режим хранения данных: ${isDBConnected ? 'База данных SQLite' : 'Локальное JSON хранилище'}`);
+    
+    logger.info(`Database connection status: ${connected}`);
+    logger.info(`Using storage mode: ${isDBConnected ? 'SQLite DB' : 'Local JSON storage'}`);
+    
+    return seedDatabase();
+  })
+  .then(() => {
+    console.log('✅ База данных проинициализирована');
+    logger.info('Database seeded successfully');
+
+    // Запускаем автоматическое резервное копирование, если база данных подключена
+    if (isDBConnected) {
+      console.log('🚀 Запуск автоматического резервного копирования...');
+      startAutoBackup().catch(error => {
+        console.error('❌ Ошибка при запуске автоматического резервного копирования:', error);
+        logger.error('Auto backup failed to start:', error);
+      });
+    }
+  })
+  .catch(err => {
+    console.error('❌ Ошибка настройки БД:', err);
+    logger.error('Database setup error:', err);
+    isDBConnected = false;
+  });
+
+// прокидываем флаг подключения к БД и localDB в каждый запрос
+app.use((req, _, next) => {
+  // Принудительно используем локальное хранилище, если задан флаг
+  req.dbConnected = isDBConnected && !FORCE_LOCAL_STORAGE;
   req.localDB = localDB;
+  
+  // Отладочный вывод для API запросов
+  if (req.url.startsWith('/api/')) {
+    console.log(`🔍 ${req.method} ${req.url} - DB Connected: ${req.dbConnected}`);
+    logger.info(`Request to ${req.method} ${req.url} - DB Connected: ${req.dbConnected}`);
+  }
+  
   next();
 });
 
-// Базовый маршрут для проверки API
-app.get('/', (req, res) => {
-  res.json({ 
-    message: 'API музея электроники работает!',
-    database: 'SQLite',
-    database_status: 'connected',
-    status: 'online',
-    timestamp: new Date().toISOString(),
-    version: '2.0.0',
-    endpoints: [
-      '/api/exhibits',
-      '/api/games',
-      '/api/quizzes',
-      '/api/reviews'
-    ]
+// =========== STATIC UPLOADS ===========
+const UPLOADS_DIR = path.join(__dirname, '../../uploads');
+fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+
+// Apply image error handler middleware
+app.use(handleImageError);
+
+// Serve static files from /uploads directory (для Vite-прокси)
+app.use('/uploads', express.static(UPLOADS_DIR, {
+  setHeaders: (res) => {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Cache-Control', 'public, max-age=31536000');
+  }
+}));
+
+logger.info(`Serving static files from ${UPLOADS_DIR}`);
+
+// =========== HEALTHCHECK ===========
+app.get('/', (_, res) => {
+  res.json({
+    status: 'ok',
+    env:    process.env.NODE_ENV,
+    time:   new Date().toISOString(),
+    api:    '/api',
+    storage: isDBConnected ? 'sqlite' : 'local'
   });
 });
 
-// API маршруты
-app.use('/api/exhibits', router);
-app.use('/api/games', gameRoutes);
-app.use('/api/quizzes', quizRoutes);
-app.use('/api/reviews', reviewRoutes);
+// =========== API ADDITIONAL INFO ===========
+app.get('/api/status', (_, res) => {
+  res.json({
+    status: 'ok',
+    dbConnected: isDBConnected,
+    storageMode: isDBConnected ? 'sqlite' : 'local',
+    collections: {
+      exhibits: localDB.getAll('exhibits').length,
+      categories: localDB.getAll('categories').length,
+      quizzes: localDB.getAll('quizzes').length,
+      games: localDB.getAll('games').length,
+      reviews: localDB.getAll('reviews').length
+    },
+    time: new Date().toISOString()
+  });
+});
 
-// Serve static files from the uploads directory
-app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
+// =========== API ROUTES ===========
+app.use('/api/exhibits',   exhibitsRouter);
+app.use('/api/quizzes',    quizzesRouter);
+app.use('/api/games',      gamesRouter);
+app.use('/api/reviews',    reviewsRouter);
+app.use('/api/categories', categoriesRouter);
+app.use('/api/auth',       authRouter);
+app.use('/api/users',      usersRouter);
+app.use('/api/tickets',    ticketsRouter);
+app.use('/api/events',     eventsRouter);
+app.use('/api/admin',      adminBackupRouter);
 
-// Serve static files if in production
+// =========== SPA SERVE (PROD) ===========
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../../dist')));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../../dist/index.html'));
+  const clientDist = path.join(__dirname, '../../dist');
+  app.use(express.static(clientDist));
+  app.get('*', (_, res) => {
+    res.sendFile(path.join(clientDist, 'index.html'));
   });
 }
 
-// Определяем порт и запускаем сервер
+// =========== ERROR HANDLER ===========
+app.use((err, _, res, __) => {
+  console.error('Unhandled error:', err);
+  res.status(err.status || 500).json({ error: err.message });
+});
+
+// =========== START SERVER ===========
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
-  console.log(`🚀 Сервер музея электроники запущен и работает на порту ${PORT}`);
-  console.log(` API доступно по адресу: http://localhost:${PORT}/api`);
-  console.log(`📊 База данных SQLite: ✅ Подключена`);
-  console.log(`📝 Примеры запросов:
-    - Получить все экспонаты: GET http://localhost:${PORT}/api/exhibits
-    - Получить все игры: GET http://localhost:${PORT}/api/games
-    - Получить все викторины: GET http://localhost:${PORT}/api/quizzes
-    - Получить все отзывы: GET http://localhost:${PORT}/api/reviews
-  `);
+  console.log(`🚀 Server listening on http://localhost:${PORT}`);
+  console.log(`🔧 Storage mode: ${isDBConnected ? 'SQLite DB' : 'Local JSON storage'}`);
 });
 
-// Обработка необработанных исключений
-process.on('uncaughtException', (err) => {
-  console.error('❌ Необработанное исключение:', err);
-  
-  if (process.env.NODE_ENV === 'production') {
-    process.exit(1);
-  }
-});
-
-// Обработка необработанных отклонений промисов
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('❌ Необработанное отклонение промиса:', reason);
-});
-
-export default app; 
+export default app;

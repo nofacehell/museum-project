@@ -1,63 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import './TimelineGame.css';
+import { FaClock, FaArrowLeft, FaTrophy, FaHistory } from 'react-icons/fa';
+import '../styles/TimelineGame.css';
 
 const TimelineGame = () => {
-  const [artPieces, setArtPieces] = useState([]);
+  const [gameStarted, setGameStarted] = useState(false);
   const [selectedPieces, setSelectedPieces] = useState([]);
   const [gameComplete, setGameComplete] = useState(false);
   const [score, setScore] = useState(0);
   const [timer, setTimer] = useState(300);
   const [isActive, setIsActive] = useState(false);
 
-  useEffect(() => {
-    const pieces = [
-      {
-        id: 1,
-        title: 'Мона Лиза',
-        artist: 'Леонардо да Винчи',
-        year: 1503,
-        image: '/images/art/mona-lisa.jpg'
-      },
-      {
-        id: 2,
-        title: 'Звездная ночь',
-        artist: 'Винсент ван Гог',
-        year: 1889,
-        image: '/images/art/starry-night.jpg'
-      },
-      {
-        id: 3,
-        title: 'Крик',
-        artist: 'Эдвард Мунк',
-        year: 1893,
-        image: '/images/art/the-scream.jpg'
-      },
-      {
-        id: 4,
-        title: 'Девушка с жемчужной сережкой',
-        artist: 'Ян Вермеер',
-        year: 1665,
-        image: '/images/art/girl-with-pearl.jpg'
-      },
-      {
-        id: 5,
-        title: 'Постоянство памяти',
-        artist: 'Сальвадор Дали',
-        year: 1931,
-        image: '/images/art/persistence-of-memory.jpg'
-      },
-      {
-        id: 6,
-        title: 'Американская готика',
-        artist: 'Грант Вуд',
-        year: 1930,
-        image: '/images/art/american-gothic.jpg'
-      }
-    ];
-
-    setArtPieces(pieces.sort(() => Math.random() - 0.5));
-  }, []);
+  const artPieces = [
+    {
+      id: 1,
+      title: 'Первый транзистор',
+      year: 1947,
+      description: 'Изобретение транзистора в Bell Labs произвело революцию в электронике',
+      image: 'https://images.unsplash.com/photo-1631887350005-c87e93b62f74?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      id: 2,
+      title: 'Первая интегральная схема',
+      year: 1958,
+      description: 'Джек Килби создал первую интегральную схему, открыв эру микроэлектроники',
+      image: 'https://images.unsplash.com/photo-1631887351423-8518f0209dda?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      id: 3,
+      title: 'Первый микропроцессор Intel 4004',
+      year: 1971,
+      description: '4-битный процессор положил начало эре современных компьютеров',
+      image: 'https://images.unsplash.com/photo-1631887350916-a83b93c6c3f0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+    }
+  ];
 
   useEffect(() => {
     let interval = null;
@@ -66,7 +42,8 @@ const TimelineGame = () => {
         setTimer(timer => timer - 1);
       }, 1000);
     } else if (timer === 0) {
-      checkTimeline();
+      setGameComplete(true);
+      setIsActive(false);
     }
     return () => clearInterval(interval);
   }, [isActive, timer]);
@@ -77,7 +54,7 @@ const TimelineGame = () => {
     setScore(0);
     setTimer(300);
     setIsActive(true);
-    setArtPieces(prevPieces => [...prevPieces].sort(() => Math.random() - 0.5));
+    setGameStarted(true);
   };
 
   const handlePieceSelect = (piece) => {
@@ -98,7 +75,6 @@ const TimelineGame = () => {
     if (isCorrect) {
       setScore(score + 1);
     }
-
     setGameComplete(true);
   };
 
@@ -108,69 +84,111 @@ const TimelineGame = () => {
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
+  if (!gameStarted) {
+    return (
+      <div className="timeline-game-intro">
+        <div className="timeline-game-intro-content">
+          <Link to="/games" className="back-button">
+            <FaArrowLeft /> Назад к играм
+          </Link>
+          
+          <div className="intro-header">
+            <div className="intro-icon">
+              <FaHistory />
+            </div>
+            <h1>Хронология электроники</h1>
+            <p className="intro-description">
+              Расположите ключевые события и изобретения в истории электроники в правильном хронологическом порядке.
+            </p>
+          </div>
+
+          <div className="game-info-grid">
+            <div className="info-card">
+              <FaClock className="info-icon" />
+              <h3>Время</h3>
+              <p>12 минут на выполнение</p>
+            </div>
+            <div className="info-card">
+              <FaTrophy className="info-icon" />
+              <h3>Сложность</h3>
+              <p>Средняя</p>
+            </div>
+          </div>
+
+          <button className="start-game-button" onClick={startGame}>
+            Начать игру
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (gameComplete) {
+    return (
+      <div className="timeline-game-complete">
+        <h2>Игра завершена!</h2>
+        <p>Ваш результат: {score} правильных последовательностей</p>
+        <div className="timeline-game-actions">
+          <button className="game-button primary" onClick={startGame}>
+            Играть снова
+          </button>
+          <Link to="/games" className="game-button secondary">
+            К списку игр
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="timeline-game-container">
       <div className="timeline-game-header">
-        <h1 className="timeline-game-title">Хронология искусства</h1>
-        <p className="timeline-game-description">
-          Расположите произведения искусства в правильном хронологическом порядке
-        </p>
+        <Link to="/games" className="back-button">
+          <FaArrowLeft /> Назад к играм
+        </Link>
+        <h1>Хронология электроники</h1>
+        <div className="game-stats">
+          <div className="stat-item">
+            <FaClock />
+            <span>Осталось времени: {formatTime(timer)}</span>
+          </div>
+          <div className="stat-item">
+            <FaTrophy />
+            <span>Счёт: {score}</span>
+          </div>
+        </div>
       </div>
 
-      <div className="timeline-game-stats">
-        <div className="stat-item">
-          <span className="uk-icon" data-uk-icon="icon: clock; ratio: 1.2"></span>
-          <span>{formatTime(timer)}</span>
-        </div>
-        <div className="stat-item">
-          <span className="uk-icon" data-uk-icon="icon: star; ratio: 1.2"></span>
-          <span>{score} очков</span>
-        </div>
-        <button className="timeline-game-button" onClick={startGame}>
-          Начать заново
-        </button>
-      </div>
-
-      {!gameComplete ? (
-        <div className="timeline-game-content">
-          <div className="timeline-game-pieces">
-            {artPieces.map((piece) => (
-              <div
-                key={piece.id}
-                className={`timeline-game-piece ${selectedPieces.includes(piece) ? 'selected' : ''}`}
-                onClick={() => handlePieceSelect(piece)}
-              >
+      <div className="timeline-game-content">
+        <div className="timeline-pieces">
+          {artPieces.map((piece) => (
+            <div
+              key={piece.id}
+              className={`timeline-piece ${selectedPieces.includes(piece) ? 'selected' : ''}`}
+              onClick={() => handlePieceSelect(piece)}
+            >
+              <div className="piece-image">
                 <img src={piece.image} alt={piece.title} />
-                <div className="piece-info">
-                  <h3>{piece.title}</h3>
-                  <p>{piece.artist}</p>
-                  <p>{piece.year}</p>
+                <div className="piece-overlay">
+                  <span className="piece-year">{piece.year}</span>
                 </div>
               </div>
-            ))}
-          </div>
-          <button 
-            className="timeline-game-button check-button"
-            onClick={checkTimeline}
-            disabled={selectedPieces.length !== artPieces.length}
-          >
-            Проверить
-          </button>
+              <div className="piece-info">
+                <h3>{piece.title}</h3>
+                <p>{piece.description}</p>
+              </div>
+            </div>
+          ))}
         </div>
-      ) : (
-        <div className="timeline-game-complete">
-          <h2>Игра завершена!</h2>
-          <p>Ваш результат: {score} очков</p>
-          <div className="timeline-game-actions">
-            <button className="timeline-game-button" onClick={startGame}>
-              Играть снова
-            </button>
-            <Link to="/games" className="timeline-game-button secondary">
-              К списку игр
-            </Link>
-          </div>
-        </div>
-      )}
+
+        <button
+          className="check-button"
+          onClick={checkTimeline}
+          disabled={selectedPieces.length !== artPieces.length}
+        >
+          Проверить последовательность
+        </button>
+      </div>
     </div>
   );
 };

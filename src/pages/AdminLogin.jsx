@@ -1,109 +1,74 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import UIkit from 'uikit';
-import 'uikit/dist/css/uikit.min.css';
-import Icons from 'uikit/dist/js/uikit-icons';
-import '../styles/admin.css';
-
-UIkit.use(Icons);
+import { FaLock, FaUser, FaSun, FaMoon } from 'react-icons/fa';
+import './AdminLogin.css';
 
 const AdminLogin = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [isDark, setIsDark] = useState(false);
+  const [darkTheme, setDarkTheme] = useState(
+    localStorage.getItem('theme') === 'dark' || 
+    window.matchMedia('(prefers-color-scheme: dark)').matches
+  );
   const navigate = useNavigate();
 
-  // Тестовые данные для входа (в реальном приложении должны храниться на сервере)
-  const ADMIN_USERNAME = 'admin';
-  const ADMIN_PASSWORD = 'admin123';
-  
-  // Проверка темы и авторизации при загрузке компонента
+  // Применяем тему при загрузке и изменении
   useEffect(() => {
-    // Проверка темы
-    const darkMode = localStorage.getItem('adminDarkMode') === 'true' || 
-                   window.matchMedia('(prefers-color-scheme: dark)').matches;
-    setIsDark(darkMode);
-    applyTheme(darkMode);
-    
-    // Скрываем стандартные элементы сайта
+    if (darkTheme) {
+      document.body.classList.add('dark-theme');
+    } else {
+      document.body.classList.remove('dark-theme');
+    }
+  }, [darkTheme]);
+
+  // Скрываем стандартные элементы сайта
+  useEffect(() => {
     const header = document.querySelector('header');
     const footer = document.querySelector('footer');
+    
     if (header) header.style.display = 'none';
     if (footer) footer.style.display = 'none';
     
-    // Проверяем, авторизован ли пользователь
-    const isAuthenticated = localStorage.getItem('isAdminAuthenticated') === 'true' || 
-                          localStorage.getItem('adminAuth') === 'true';
+    // Проверяем авторизацию
+    const isAuthenticated = localStorage.getItem('adminAuth') === 'true';
     
     if (isAuthenticated) {
       navigate('/admin/dashboard');
-      return;
     }
     
-    // Проверяем наличие параметра logout
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('logout')) {
-      UIkit.notification({
-        message: 'Вы успешно вышли из панели администратора',
-        status: 'success',
-        pos: 'top-center',
-        timeout: 2000
-      });
-      
-      // Очищаем URL от параметра logout
-      window.history.replaceState({}, document.title, '/admin');
-    }
-    
-    // Восстанавливаем элементы при размонтировании
+    // Восстанавливаем отображение при размонтировании
     return () => {
       if (header) header.style.display = '';
       if (footer) footer.style.display = '';
     };
   }, [navigate]);
-  
-  // Применение темы
-  const applyTheme = (dark) => {
-    if (dark) {
-      document.documentElement.classList.add('admin-dark-mode');
-      document.body.classList.add('admin-dark-mode');
-    } else {
-      document.documentElement.classList.remove('admin-dark-mode');
-      document.body.classList.remove('admin-dark-mode');
-    }
-  };
-  
-  // Переключение темы
+
   const toggleTheme = () => {
-    const newDarkMode = !isDark;
-    setIsDark(newDarkMode);
-    applyTheme(newDarkMode);
-    localStorage.setItem('adminDarkMode', newDarkMode ? 'true' : 'false');
+    const newTheme = !darkTheme;
+    setDarkTheme(newTheme);
+    localStorage.setItem('theme', newTheme ? 'dark' : 'light');
   };
 
-  // Обработка формы входа
   const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     
-    // Имитация задержки сервера
+    // Имитация авторизации на сервере
     setTimeout(() => {
-      if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-        // Запись информации о авторизации
-        localStorage.setItem('isAdminAuthenticated', 'true');
+      if (username === 'admin' && password === 'admin123') {
+        console.log("AdminLogin: Авторизация успешна");
+        
+        // Сохраняем информацию об авторизации
         localStorage.setItem('adminAuth', 'true');
+        localStorage.setItem('isAdminAuthenticated', 'true');
+        localStorage.setItem('adminUsername', username);
         
-        UIkit.notification({
-          message: 'Успешная авторизация!',
-          status: 'success',
-          pos: 'top-center',
-          timeout: 2000
-        });
-        
-        // Перенаправление на панель администратора
-        navigate('/admin/dashboard');
+        // Перенаправляем на админ-панель используя navigate вместо window.location
+        console.log("AdminLogin: Redirecting to /admin");
+        navigate('/admin');
       } else {
         setError('Неверное имя пользователя или пароль');
         setLoading(false);
@@ -112,51 +77,62 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className={`admin-login ${isDark ? 'dark-mode' : 'light-mode'}`}>
-      <div className="theme-toggle-container">
-        <button onClick={toggleTheme} className="theme-toggle-login">
-          {isDark ? '☀️ Светлая тема' : '🌙 Темная тема'}
+    <div className={`admin-login-page ${darkTheme ? 'dark' : 'light'}`}>
+      <div className="theme-toggle-wrapper">
+        <button 
+          className="theme-toggle-button"
+          onClick={toggleTheme}
+          aria-label="Переключить тему"
+        >
+          {darkTheme ? <FaSun /> : <FaMoon />}
         </button>
       </div>
       
-      <div className="login-container">
-        <div className="login-card">
-          <div className="login-header">
-            <div className="logo">
-              <span uk-icon="icon: album; ratio: 2"></span>
-            </div>
-            <h1>Музей Онлайн</h1>
-            <p>Вход в панель администратора</p>
+      <div className="admin-login-container">
+        <div className="admin-login-card">
+          <div className="admin-login-header">
+            <FaLock className="admin-login-icon" />
+            <h1>Панель администратора</h1>
+            <p>Введите данные для входа</p>
           </div>
           
           {error && (
-            <div className="uk-alert uk-alert-danger">
-              <span uk-icon="icon: warning; ratio: 0.8"></span> {error}
+            <div className="admin-login-error">
+              {error}
             </div>
           )}
           
-          <form onSubmit={handleSubmit} className="login-form">
-            <div className="uk-margin">
-              <div className="uk-inline uk-width-1-1">
-                <span className="uk-form-icon" uk-icon="icon: user"></span>
+          <form onSubmit={handleSubmit} className="admin-login-form">
+            <div className="admin-form-group">
+              <label htmlFor="username" className="admin-form-label">
+                Имя пользователя
+              </label>
+              <div className="admin-input-wrapper">
+                <FaUser className="admin-input-icon" />
                 <input
-                  className="uk-input"
+                  id="username"
                   type="text"
-                  placeholder="Имя пользователя"
+                  className="admin-form-input"
+                  placeholder="Введите имя пользователя"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
+                  autoFocus
                 />
               </div>
             </div>
             
-            <div className="uk-margin">
-              <div className="uk-inline uk-width-1-1">
-                <span className="uk-form-icon" uk-icon="icon: lock"></span>
+            <div className="admin-form-group">
+              <label htmlFor="password" className="admin-form-label">
+                Пароль
+              </label>
+              <div className="admin-input-wrapper">
+                <FaLock className="admin-input-icon" />
                 <input
-                  className="uk-input"
+                  id="password"
                   type="password"
-                  placeholder="Пароль"
+                  className="admin-form-input"
+                  placeholder="Введите пароль"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -166,25 +142,21 @@ const AdminLogin = () => {
             
             <button 
               type="submit" 
-              className="uk-button uk-button-primary uk-width-1-1"
+              className={`admin-login-button ${loading ? 'loading' : ''}`}
               disabled={loading}
             >
-              {loading ? (
-                <div uk-spinner="ratio: 0.6"></div>
-              ) : (
-                <>Войти <span uk-icon="sign-in"></span></>
-              )}
+              {loading ? 'Вход...' : 'Войти'}
             </button>
           </form>
           
-          <div className="login-hint">
-            <p>Данные для входа: admin / admin123</p>
+          <div className="admin-login-hint">
+            
           </div>
         </div>
       </div>
       
-      <div className="login-footer">
-        <p>&copy; 2023 Музей Онлайн | Панель администратора</p>
+      <div className="admin-login-footer">
+        <p>&copy; {new Date().getFullYear()} Виртуальный Музей</p>
       </div>
     </div>
   );

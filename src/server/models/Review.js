@@ -1,8 +1,9 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../config/sequelize.js';
+import { Model, DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
-// Модель отзывов о музее
-const Review = sequelize.define('Review', {
+class Review extends Model {}
+
+Review.init({
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -11,13 +12,6 @@ const Review = sequelize.define('Review', {
   name: {
     type: DataTypes.STRING,
     allowNull: false
-  },
-  email: {
-    type: DataTypes.STRING,
-    allowNull: true,
-    validate: {
-      isEmail: true
-    }
   },
   rating: {
     type: DataTypes.INTEGER,
@@ -34,150 +28,99 @@ const Review = sequelize.define('Review', {
   images: {
     type: DataTypes.TEXT,
     allowNull: true,
-    comment: 'JSON строка с массивом URL или data:image строк',
     get() {
       const rawValue = this.getDataValue('images');
-      if (rawValue) {
-        try {
-          return JSON.parse(rawValue);
-        } catch (e) {
-          console.error('Error parsing images JSON:', e);
-          return [];
-        }
-      }
-      return [];
+      return rawValue ? JSON.parse(rawValue) : [];
     },
     set(value) {
-      if (Array.isArray(value)) {
-        // Если массив пустой, сохраняем null
-        if (value.length === 0) {
-          this.setDataValue('images', null);
-        } else {
-          this.setDataValue('images', JSON.stringify(value));
-        }
-      } else if (typeof value === 'string' && value.startsWith('data:image')) { // Проверяем, что строка - это data URL
-        // Если пришла одна строка (data URL), сохраняем её как массив с одним элементом
-        this.setDataValue('images', JSON.stringify([value]));
-      } else {
-        // Во всех остальных случаях (включая пустую строку или некорректные данные) сохраняем null
-        this.setDataValue('images', null);
-      }
+      this.setDataValue('images', value ? JSON.stringify(value) : null);
     }
   },
-  image: {
-    type: DataTypes.VIRTUAL,
-    get() {
-      const images = this.images;
-      return images && images.length > 0 ? images[0] : null;
-    },
-    set(value) {
-      if (value) {
-        this.images = [value];
-      }
+  status: {
+    type: DataTypes.ENUM('pending', 'approved', 'rejected'),
+    defaultValue: 'pending'
+  },
+  visitorName: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  visitorEmail: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      isEmail: true
     }
   },
   exhibitId: {
     type: DataTypes.INTEGER,
-    allowNull: true,
-    references: {
-      model: 'exhibits',
-      key: 'id'
-    }
-  },
-  status: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    defaultValue: 'pending',
-    validate: {
-      isIn: [['pending', 'approved', 'rejected']]
-    }
-  },
-  approved: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-    defaultValue: false,
-    set(value) {
-      this.setDataValue('approved', value);
-      // Синхронизируем status с approved
-      if (value === true) {
-        this.setDataValue('status', 'approved');
-      } else if (value === false) {
-        this.setDataValue('status', 'rejected');
-      }
-    }
-  },
-  visitDate: {
-    type: DataTypes.DATE,
     allowNull: true
   }
 }, {
-  timestamps: true,
+  sequelize,
+  modelName: 'Review',
   tableName: 'reviews',
-  hooks: {
-    beforeSave: (review) => {
-      // Синхронизируем approved со status
-      if (review.status === 'approved') {
-        review.approved = true;
-      } else if (review.status === 'rejected') {
-        review.approved = false;
-      }
-    }
-  }
+  timestamps: true,
+  underscored: true
 });
 
-// Данные для начального заполнения
-const defaultReviews = [
+// Sample data for reviews
+const sampleReviews = [
   {
-    name: "Алексей Петров",
-    email: "alex@example.com",
+    name: "Иван Петров",
+    visitorName: "Иван Петров",
+    visitorEmail: "ivan@example.com",
     rating: 5,
-    comment: "Потрясающая экспозиция! Особенно впечатлили старые компьютеры и игровые приставки. Очень интересно было увидеть эволюцию электроники за последние 50 лет. Обязательно приду ещё раз с детьми!",
-    exhibitId: 1,
-    approved: true,
-    visitDate: new Date(2023, 5, 15)
+    comment: "Отличный музей! Очень понравилась экспозиция.",
+    images: null,
+    status: 'approved'
   },
   {
     name: "Мария Иванова",
-    email: "maria@example.com",
+    visitorName: "Мария Иванова",
+    visitorEmail: "maria@example.com",
     rating: 4,
-    comment: "Интересная экспозиция. Понравились интерактивные экспонаты и возможность поиграть на старых приставках. Хотелось бы больше информации о современных технологиях.",
-    exhibitId: null,
-    approved: true,
-    visitDate: new Date(2023, 6, 22)
+    comment: "Интересные экспонаты, но можно было бы добавить больше информации.",
+    images: null,
+    status: 'approved'
   },
   {
-    name: "Дмитрий Сидоров",
-    email: "dmitry@example.com",
+    name: "Алексей Смирнов",
+    visitorName: "Алексей Смирнов",
+    visitorEmail: "alexey@example.com",
     rating: 5,
-    comment: "Музей превзошел все ожидания! Экскурсовод очень увлекательно рассказывал историю каждого экспоната. Особенно понравился раздел с мобильными телефонами - было забавно показать детям, какими огромными были первые мобильники.",
-    exhibitId: 3,
-    approved: true,
-    visitDate: new Date(2023, 7, 10)
+    comment: "Прекрасное место для семейного посещения!",
+    images: null,
+    status: 'approved'
   }
 ];
 
-// Функция для заполнения базы данных тестовыми отзывами
-const seedReviews = async (force = false) => {
+// Function to seed reviews
+export const seedReviews = async (force = false) => {
   try {
-    // Проверяем, есть ли уже данные в таблице
-    const count = await Review.count();
-    
-    // Если данных нет или указан флаг принудительного заполнения
-    if (count === 0 || force) {
-      console.log('📥 Добавление тестовых отзывов в базу данных...');
-      
-      // Создаем записи последовательно
-      for (const item of defaultReviews) {
-        await Review.create(item);
+    if (!force) {
+      const count = await Review.count();
+      if (count > 0) {
+        console.log(`Reviews table already has ${count} records. Skipping seeding.`);
+        return;
       }
-      
-      console.log(`✅ Добавлено ${defaultReviews.length} тестовых отзывов`);
-    } else {
-      console.log(`ℹ️ В базе данных уже есть ${count} отзывов. Пропускаем добавление тестовых данных.`);
     }
+    
+    console.log('Starting to seed reviews with data:', JSON.stringify(sampleReviews, null, 2));
+    const result = await Review.bulkCreate(sampleReviews, {
+      validate: true,
+      logging: console.log
+    });
+    console.log('✅ Reviews seeded successfully:', result.length, 'reviews created');
   } catch (error) {
-    console.error('❌ Ошибка при добавлении тестовых отзывов:', error);
+    console.error('❌ Error seeding reviews. Full error:', {
+      message: error.message,
+      name: error.name,
+      sql: error.sql,
+      parameters: error.parameters,
+      stack: error.stack
+    });
+    throw error;
   }
 };
 
-export { Review, seedReviews }; 
+export default Review;

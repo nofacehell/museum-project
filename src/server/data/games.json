@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "title": "Викторина по истории компьютеров",
+    "description": "Проверьте свои знания в истории компьютерной техники",
+    "type": "quiz",
+    "image": "/uploads/games/computer-quiz.jpg",
+    "category": "computers",
+    "difficulty": "medium",
+    "config": {
+      "questions": 10,
+      "timeLimit": 180
+    },
+    "createdAt": "2023-04-15T10:25:00.000Z",
+    "updatedAt": "2023-04-15T10:25:00.000Z"
+  },
+  {
+    "id": 2,
+    "title": "Пазл Nokia 3310",
+    "description": "Соберите изображение легендарного телефона",
+    "type": "puzzle",
+    "image": "/uploads/games/nokia-puzzle.jpg",
+    "category": "phones",
+    "difficulty": "easy",
+    "config": {
+      "pieces": 16,
+      "timeLimit": 300
+    },
+    "createdAt": "2023-04-15T10:26:00.000Z",
+    "updatedAt": "2023-04-15T10:26:00.000Z"
+  }
+]

@@ -16,6 +16,27 @@ if (!fs.existsSync(dbDir)) {
   fs.mkdirSync(dbDir, { recursive: true });
 }
 
+// Проверка существования и доступности файла БД
+const isDBFileAccessible = () => {
+  try {
+    // Проверяем существование файла
+    if (!fs.existsSync(dbPath)) {
+      console.log(`⚠️ База данных не найдена по пути: ${dbPath}`);
+      return false;
+    }
+    
+    // Проверяем доступность файла для чтения/записи
+    fs.accessSync(dbPath, fs.constants.R_OK | fs.constants.W_OK);
+    const stats = fs.statSync(dbPath);
+    console.log(`📊 Размер файла БД: ${stats.size} байт, дата изменения: ${stats.mtime}`);
+    
+    return true;
+  } catch (error) {
+    console.error(`❌ Ошибка доступа к файлу БД: ${error.message}`);
+    return false;
+  }
+};
+
 // Создаем экземпляр Sequelize
 const sequelize = new Sequelize({
   dialect: 'sqlite',
@@ -30,14 +51,25 @@ const sequelize = new Sequelize({
 // Функция для подключения к базе данных
 export const connectDB = async () => {
   try {
+    // Проверяем доступность файла БД
+    const isFileOK = isDBFileAccessible();
+    if (!isFileOK) {
+      console.warn('❗ Файл базы данных недоступен, будет использоваться локальное хранилище');
+      return false;
+    }
+    
+    // Пытаемся аутентифицироваться в базе данных
     await sequelize.authenticate();
-    console.log('✅ Успешное подключение к SQLite базе данных');
     
-    // Синхронизируем модели с БД (создаем таблицы, если их нет)
-    await sequelize.sync({ force: true });
-    console.log('✅ Таблицы в базе данных пересозданы');
-    
-    return true;
+    // Проверяем, что база содержит необходимые таблицы
+    try {
+      await sequelize.query('SELECT count(*) FROM sqlite_master WHERE type="table"');
+      console.log('✅ Успешное подключение к SQLite базе данных');
+      return true;
+    } catch (tableError) {
+      console.error('❌ Ошибка проверки таблиц в базе данных:', tableError.message);
+      return false;
+    }
   } catch (error) {
     console.error('❌ Ошибка подключения к базе данных:', error.message);
     return false;

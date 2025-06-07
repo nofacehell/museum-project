@@ -1,111 +1,98 @@
-import React, { useEffect, useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { NavLink, Link } from 'react-router-dom';
+import {
+  FaUserCog,
+  FaBars,
+  FaTimes,
+  FaHome,
+  FaLandmark,
+  FaQuestionCircle,
+  FaCommentAlt,
+  FaInfoCircle,
+  FaGamepad
+} from 'react-icons/fa';
+import { MdMuseum } from 'react-icons/md';
+import { useTheme } from '../contexts/ThemeContext';
 import ThemeToggle from './ThemeToggle';
 import './Header.css';
 
 const Header = () => {
-  const [isDark, setIsDark] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const navigate = useNavigate();
-  
-  // Определяем текущую тему при монтировании
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   useEffect(() => {
-    // Проверяем, авторизован ли пользователь как админ
-    const adminAuth = 
-      localStorage.getItem('adminAuth') === 'true' || 
-      localStorage.getItem('isAdminAuthenticated') === 'true';
-    setIsAdmin(adminAuth);
-    
-    const checkTheme = () => {
-      const darkThemeDetected = 
-        document.documentElement.classList.contains('dark-theme') || 
-        document.body.classList.contains('dark-theme') ||
-        localStorage.getItem('adminDarkMode') === 'true' ||
-        localStorage.getItem('darkTheme') === 'true';
-        
-      setIsDark(darkThemeDetected);
-      
-      // Применяем стили напрямую к header для надежности
-      const header = document.querySelector('.header');
-      if (header) {
-        if (darkThemeDetected) {
-          header.classList.add('dark-theme-header');
-        } else {
-          header.classList.remove('dark-theme-header');
-        }
-      }
-    };
-    
-    // Проверяем тему при монтировании
-    checkTheme();
-    
-    // Слушаем события изменения темы
-    const handleThemeChange = (event) => {
-      const isDarkTheme = event.detail?.dark || false;
-      setIsDark(isDarkTheme);
-      console.log("Header: Получено событие изменения темы", isDarkTheme ? "темная" : "светлая");
-    };
-    
-    // Подписываемся на событие themechange
-    document.addEventListener('themechange', handleThemeChange);
-    
-    // Отписываемся при размонтировании
-    return () => {
-      document.removeEventListener('themechange', handleThemeChange);
-    };
+    const onScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
-  
-  // Обработчик клика на кнопку "Админ"
-  const handleAdminClick = (e) => {
-    e.preventDefault();
-    // HashRouter использует # в URL
-    navigate('/admin');
-    // После навигации перезагружаем страницу, чтобы быть уверенным, что маршрут обработан
-    setTimeout(() => {
-      window.location.reload();
-    }, 100);
+
+  const toggleMobile = () => {
+    setMobileOpen(open => !open);
+    document.body.style.overflow = mobileOpen ? 'auto' : 'hidden';
   };
-  
+
+  const closeMobile = () => {
+    setMobileOpen(false);
+    document.body.style.overflow = 'auto';
+  };
+
   return (
-    <header className={`header ${isDark ? 'dark-theme-header' : ''}`} data-theme={isDark ? 'dark' : 'light'}>
-      <div className="header-container">
-        <Link to="/" className="logo" style={{ color: isDark ? '#F9FAFB' : '#1e3a8a' }}>
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 8V19H21V8L12 3L3 8Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M9 15V19M15 15V19M3 8H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          Музей Онлайн
+    <header className={`header ${scrolled ? 'header--scrolled' : ''} ${isDark ? 'header--dark' : ''}`}>
+      <div className="header__inner">
+        <Link to="/" className="header__logo" onClick={closeMobile}>
+          <MdMuseum className="header__logo-icon" />
+          <span className="header__logo-text">Музей электричества</span>
         </Link>
 
-        <nav className="nav-links">
-          <NavLink to="/exhibits" className="nav-link" style={{ color: isDark ? '#F9FAFB' : '#1e3a8a' }}>
-            ЭКСПОНАТЫ
-          </NavLink>
-          <NavLink to="/quizzes" className="nav-link" style={{ color: isDark ? '#F9FAFB' : '#1e3a8a' }}>
-            ВИКТОРИНЫ
-          </NavLink>
-          <NavLink to="/games" className="nav-link" style={{ color: isDark ? '#F9FAFB' : '#1e3a8a' }}>
-            ИГРЫ
-          </NavLink>
-          <NavLink to="/about" className="nav-link" style={{ color: isDark ? '#F9FAFB' : '#1e3a8a' }}>
-            О НАС
-          </NavLink>
-          <NavLink to="/reviews" className="nav-link" style={{ color: isDark ? '#F9FAFB' : '#1e3a8a' }}>
-            ОТЗЫВЫ
-          </NavLink>
-          <a 
-            href="#" 
-            className="nav-link" 
-            style={{ color: isDark ? '#F9FAFB' : '#1e3a8a' }}
-            onClick={handleAdminClick}
-          >
-            АДМИН
-          </a>
-          <ThemeToggle />
+        <nav className={`header__nav ${mobileOpen ? 'header__nav--open' : ''}`}>
+          <ul className="header__list">
+            <li>
+              <NavLink to="/" end className="header__link" onClick={closeMobile}>
+                <FaHome /> Главная
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/exhibits" className="header__link" onClick={closeMobile}>
+                <FaLandmark /> Экспонаты
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/games" className="header__link" onClick={closeMobile}>
+                <FaGamepad /> Игры
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/quizzes" className="header__link" onClick={closeMobile}>
+                <FaQuestionCircle /> Викторины
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/reviews" className="header__link" onClick={closeMobile}>
+                <FaCommentAlt /> Отзывы
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/about" className="header__link" onClick={closeMobile}>
+                <FaInfoCircle /> О нас
+              </NavLink>
+            </li>
+          </ul>
         </nav>
+
+        <div className="header__controls">
+          <ThemeToggle />
+          <Link to="/admin" className="header__admin">
+            <FaUserCog /> 
+          </Link>
+          <button className="header__toggle-btn" onClick={toggleMobile} aria-label="Меню">
+            {mobileOpen ? <FaTimes /> : <FaBars />}
+          </button>
+        </div>
       </div>
     </header>
   );
 };
 
-export default Header; 
+export default Header;

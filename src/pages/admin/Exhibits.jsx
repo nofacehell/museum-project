@@ -136,7 +136,7 @@ const Exhibits = () => {
   }, []);
 
   return (
-    <div style={styles.container} className="admin-exhibits-container">
+    <div className="admin-exhibits-container">
       {/* ... existing code ... */}
     </div>
   );

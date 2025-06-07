@@ -1,125 +1,83 @@
-import axios from 'axios';
+// src/utils/api.js
+import axios from 'axios'
+import { API_URL, IS_DEV } from './config'
 
-// Debug logging function
-const logApiCall = (method, url, data = null, error = null) => {
-  console.group(`📡 API ${method.toUpperCase()} ${url}`);
-  
-  if (data) {
-    console.log('Data:', data);
-  }
-  
-  if (error) {
-    console.error('Error:', error);
-  }
-  
-  console.groupEnd();
-};
+// утилита логирования
+const logApi = IS_DEV
+  ? (method, url, msg, data) => {
+      console.group(`📡 ${method.toUpperCase()} ${url}`)
+      if (msg) console.log(msg)
+      if (data) console.log('Data:', data)
+      console.groupEnd()
+    }
+  : () => {}
 
-// Configure API URL with fallback
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
-
-console.log('🔗 API URL configured as:', API_URL);
-
-// Create an Axios instance with common configuration
+// создаём axios‑инстанс
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: '/api',
   headers: {
     'Content-Type': 'application/json',
+    Accept: 'application/json',
   },
-  timeout: 10000, // 10 second timeout
-});
+  timeout: 15_000,
+  withCredentials: true,
+})
 
-// Debug mode for development
-const DEBUG = import.meta.env.VITE_DEBUG === 'true';
-
-// Add request interceptor for logging
-api.interceptors.request.use(
-  (config) => {
-    logApiCall(config.method, config.url);
-    return config;
-  },
-  (error) => {
-    console.error('❌ API Request error:', error);
-    return Promise.reject(error);
+// логируем все исходящие запросы
+api.interceptors.request.use(cfg => {
+  // Ensure the URL starts with /api for non-upload requests
+  if (!cfg.url.startsWith('/uploads')) {
+    cfg.url = cfg.url.startsWith('/') ? cfg.url : `/${cfg.url}`
   }
-);
+  logApi(cfg.method, cfg.url, '→ Request', cfg.data)
+  return cfg
+})
 
-// Add response interceptor for error handling
+// логируем ответы и сразу отдаем тело
 api.interceptors.response.use(
-  (response) => {
-    return response.data;
+  res => {
+    logApi(res.config.method, res.config.url, '← Response', res.data)
+    return res.data
   },
-  (error) => {
-    const { config, response } = error;
-    
+  err => {
+    const { config, response, request, message } = err
     if (response) {
-      logApiCall(config.method, config.url, null, `Status: ${response.status} - ${response.statusText}`);
-    } else if (error.request) {
-      logApiCall(config.method, config.url, null, 'No response received');
+      logApi(config.method, config.url, `✖ Status ${response.status}`, response.data)
+    } else if (request) {
+      logApi(config.method, config.url, '✖ No response received')
     } else {
-      logApiCall(config.method, config.url, null, error.message);
+      logApi(config.method, config.url, `✖ Axios error: ${message}`)
     }
-    
-    return Promise.reject(error);
+    return Promise.reject(err)
   }
-);
+)
 
-// Helper function to handle API errors
-const handleApiError = (error) => {
-  console.error('API Error:', error);
-  
-  if (error.response) {
-    // Server responded with non-2xx status
-    console.error('Response data:', error.response.data);
-    console.error('Status:', error.response.status);
-    return {
-      error: error.response.data.message || 'An error occurred with the request',
-      status: error.response.status
-    };
-  } else if (error.request) {
-    // Request was made but no response received
-    console.error('No response received:', error.request);
-    return {
-      error: 'Server did not respond. Please check your network connection.',
-      status: 0
-    };
-  } else {
-    // Error in setting up request
-    console.error('Request setup error:', error.message);
-    return {
-      error: 'Error setting up request: ' + error.message,
-      status: -1
-    };
-  }
-};
+function handleError(err) {
+  console.error('API Error:', err)
+  throw err
+}
 
-// EXHIBITS API
+// ——— EXHIBITS —————————————————————————————
 export const getExhibits = async () => {
-  try {
-    return await api.get('/exhibits');
-  } catch (error) {
-    console.error('Failed to fetch exhibits:', error);
-    throw error;
-  }
-};
+  try { return await api.get('/exhibits') }
+  catch (e) { handleError(e) }
+}
 
-export const getExhibitById = async (id) => {
-  try {
-    return await api.get(`/exhibits/${id}`);
-  } catch (error) {
-    console.error(`Error fetching exhibit ${id}:`, error);
-    throw error;
-  }
-};
+export const getExhibitById = async id => {
+  try { return await api.get(`/exhibits/${id}`) }
+  catch (e) { handleError(e) }
+}
 
 export const createExhibit = async (formData) => {
   try {
-    const response = await api.post('/exhibits', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+    const response = await fetch('/api/exhibits', {
+      method: 'POST',
+      body: formData
     });
-    return response.data;
+    if (!response.ok) {
+      throw new Error('Failed to create exhibit');
+    }
+    return await response.json();
   } catch (error) {
     console.error('Error creating exhibit:', error);
     throw error;
@@ -128,213 +86,227 @@ export const createExhibit = async (formData) => {
 
 export const updateExhibit = async (id, formData) => {
   try {
-    const response = await api.put(`/exhibits/${id}`, formData, {
+    const response = await fetch(`/api/exhibits/${id}`, {
+      method: 'PUT',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update exhibit');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating exhibit:', error);
+    throw error;
+  }
+};
+
+export const getExhibit = async (id) => {
+  try {
+    const response = await fetch(`/api/exhibits/${id}`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch exhibit');
+    }
+
+    const data = await response.json();
+    
+    // Parse JSON fields
+    return {
+      ...data,
+      technical_specs: typeof data.technical_specs === 'string' 
+        ? JSON.parse(data.technical_specs) 
+        : data.technical_specs,
+      additional_images: typeof data.additional_images === 'string'
+        ? JSON.parse(data.additional_images)
+        : data.additional_images,
+      interesting_facts: typeof data.interesting_facts === 'string'
+        ? JSON.parse(data.interesting_facts)
+        : data.interesting_facts,
+    };
+  } catch (error) {
+    console.error('Error fetching exhibit:', error);
+    throw error;
+  }
+};
+
+export const toggleFeatured = async (id) => {
+  try {
+    const response = await fetch(`/api/exhibits/${id}/toggle-featured`, {
+      method: 'PUT',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to toggle featured status');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error toggling featured status:', error);
+    throw error;
+  }
+};
+
+export const deleteExhibit = async id => {
+  try {
+    await api.delete(`/exhibits/${id}`)
+    return { success: true }
+  } catch (e) {
+    console.warn(`Failed to delete exhibit ${id}`, e)
+    return { success: false, error: e.message }
+  }
+}
+
+// ——— GAMES ———————————————————————————————
+export const getGames = async () => {
+  try { return await api.get('/games') }
+  catch (e) { handleError(e) }
+}
+
+export const getGameById = async id => {
+  try { return await api.get(`/games/${id}`) }
+  catch (e) { handleError(e) }
+}
+
+export const createGame = async data => {
+  try { return await api.post('/games', data) }
+  catch (e) { handleError(e) }
+}
+
+export const updateGame = async (id, data) => {
+  try { return await api.put(`/games/${id}`, data) }
+  catch (e) { handleError(e) }
+}
+
+export const deleteGame = async id => {
+  try {
+    await api.delete(`/games/${id}`)
+    return { success: true }
+  } catch (e) {
+    console.warn(`Failed to delete game ${id}`, e)
+    return { success: false, error: e.message }
+  }
+}
+
+// ——— QUIZZES —————————————————————————————
+export const getQuizzes = async () => {
+  try { return await api.get('/quizzes') }
+  catch (e) { handleError(e) }
+}
+
+export const fetchQuiz = async (id) => {
+  try { return await api.get(`/quizzes/${id}`) }
+  catch (e) { handleError(e) }
+}
+
+export const getQuizById = async id => {
+  try { return await api.get(`/quizzes/${id}`) }
+  catch (e) { handleError(e) }
+}
+
+export const createQuiz = async data => {
+  try { return await api.post('/quizzes', data) }
+  catch (e) { handleError(e) }
+}
+
+export const updateQuiz = async (id, data) => {
+  try { return await api.put(`/quizzes/${id}`, data) }
+  catch (e) { handleError(e) }
+}
+
+export const deleteQuiz = async id => {
+  try {
+    await api.delete(`/quizzes/${id}`)
+    return { success: true }
+  } catch (e) {
+    console.warn(`Failed to delete quiz ${id}`, e)
+    return { success: false, error: e.message }
+  }
+}
+
+// ——— REVIEWS —————————————————————————————
+export const getReviews = async () => {
+  try { return await api.get('/reviews') }
+  catch (e) { handleError(e) }
+}
+
+export const getAdminReviews = async () => {
+  try { 
+    const result = await api.get('/reviews/admin');
+    console.log('Admin reviews API response:', result);
+    return result;
+  }
+  catch (e) { 
+    console.error('Error in getAdminReviews:', e);
+    handleError(e);
+    return []; // Return empty array instead of undefined
+  }
+}
+
+export const createReview = async data => {
+  try {
+    const config = data instanceof FormData ? {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
+    } : {};
+    return await api.post('/reviews', data, config);
+  } catch (e) { 
+    handleError(e) 
+  }
+}
+
+export const updateReviewStatus = async (reviewId, status) => {
+  try {
+    const response = await api.patch(`/reviews/${reviewId}/status`, {
+      status: status
     });
     return response.data;
   } catch (error) {
-    console.error(`Error updating exhibit ${id}:`, error);
-    throw error;
+    handleError(error);
   }
 };
 
-export const deleteExhibit = async (id) => {
+export const deleteReview = async (reviewId) => {
   try {
-    return await api.delete(`/exhibits/${id}`);
-  } catch (error) {
-    console.error(`Error deleting exhibit ${id}:`, error);
-    throw error;
-  }
-};
-
-// GAMES API
-export const getGames = async () => {
-  try {
-    return await api.get('/games');
-  } catch (error) {
-    console.error('Error fetching games:', error);
-    throw error;
-  }
-};
-
-export const getGameById = async (id) => {
-  try {
-    return await api.get(`/games/${id}`);
-  } catch (error) {
-    console.error(`Error fetching game ${id}:`, error);
-    throw error;
-  }
-};
-
-export const createGame = async (gameData) => {
-  try {
-    return await api.post('/games', gameData);
-  } catch (error) {
-    console.error('Error creating game:', error);
-    throw error;
-  }
-};
-
-export const updateGame = async (id, gameData) => {
-  try {
-    return await api.put(`/games/${id}`, gameData);
-  } catch (error) {
-    console.error(`Error updating game ${id}:`, error);
-    throw error;
-  }
-};
-
-export const deleteGame = async (id) => {
-  try {
-    return await api.delete(`/games/${id}`);
-  } catch (error) {
-    console.error(`Error deleting game ${id}:`, error);
-    throw error;
-  }
-};
-
-// QUIZZES API
-export const getQuizzes = async () => {
-  try {
-    return await api.get('/quizzes');
-  } catch (error) {
-    console.error('Error fetching quizzes:', error);
-    throw error;
-  }
-};
-
-export const getQuizById = async (id) => {
-  try {
-    return await api.get(`/quizzes/${id}`);
-  } catch (error) {
-    console.error(`Error fetching quiz ${id}:`, error);
-    throw error;
-  }
-};
-
-export const createQuiz = async (quizData) => {
-  try {
-    return await api.post('/quizzes', quizData);
-  } catch (error) {
-    console.error('Error creating quiz:', error);
-    throw error;
-  }
-};
-
-export const updateQuiz = async (id, quizData) => {
-  try {
-    return await api.put(`/quizzes/${id}`, quizData);
-  } catch (error) {
-    console.error(`Error updating quiz ${id}:`, error);
-    throw error;
-  }
-};
-
-export const deleteQuiz = async (id) => {
-  try {
-    return await api.delete(`/quizzes/${id}`);
-  } catch (error) {
-    console.error(`Error deleting quiz ${id}:`, error);
-    throw error;
-  }
-};
-
-// REVIEWS API
-export const getReviews = async () => {
-  try {
-    return await api.get('/reviews');
-  } catch (error) {
-    console.error('Error fetching reviews:', error);
-    throw error;
-  }
-};
-
-export const getAdminReviews = async () => {
-  try {
-    return await api.get('/reviews/admin');
-  } catch (error) {
-    console.error('Error fetching admin reviews:', error);
-    throw error;
-  }
-};
-
-export const createReview = async (reviewData) => {
-  try {
-    console.log('Creating review with data:', reviewData);
-    
-    // Ensure the review data is properly formatted for the API
-    const formattedData = {
-      name: reviewData.name,
-      comment: reviewData.text || reviewData.comment, // Используем text как comment
-      rating: reviewData.rating,
-      // Обрабатываем изображения
-      images: reviewData.images ? reviewData.images : null,
-      // Add approved status if not present (defaults to false/pending)
-      approved: false,
-      status: 'pending',
-      // Ensure createdAt is set if not already
-      createdAt: new Date().toISOString()
-    };
-    
-    console.log('Sending formatted review data:', formattedData);
-    const response = await api.post('/reviews', formattedData);
-    console.log('Review creation API response:', response);
-    return response; // Return the response directly
-  } catch (error) {
-    console.error('Error creating review:', error);
-    throw error;
-  }
-};
-
-/**
- * Обновляет статус отзыва (одобрить/отклонить)
- * @param {number} id - ID отзыва
- * @param {string} status - Новый статус ('approved', 'rejected')
- */
-export const updateReviewStatus = async (id, status) => {
-  console.log(`Updating review ${id} status to: ${status}`);
-  const approved = status === 'approved';
-  const data = { status, approved };
-  try {
-    const response = await api.patch(`/reviews/${id}/status`, data);
-    console.log('API Response for review status update:', response.data);
+    const response = await api.delete(`/reviews/${reviewId}`);
     return response.data;
   } catch (error) {
-    logApiCall('PATCH', `/reviews/${id}/status`, data, error.response);
-    console.error(`Error updating review status ${id}:`, error.response?.data || error.message);
-    throw error;
+    handleError(error);
   }
 };
 
-export const deleteReview = async (id) => {
+// ——— CATEGORIES ——————————————————————————
+export const getCategories = async () => {
+  try { return await api.get('/categories') }
+  catch (e) { handleError(e) }
+}
+
+export const getCategoryById = async id => {
+  try { return await api.get(`/categories/${id}`) }
+  catch (e) { handleError(e) }
+}
+
+export const createCategory = async data => {
+  try { return await api.post('/categories', data) }
+  catch (e) { handleError(e) }
+}
+
+export const updateCategory = async (id, data) => {
+  try { return await api.put(`/categories/${id}`, data) }
+  catch (e) { handleError(e) }
+}
+
+export const deleteCategory = async id => {
   try {
-    return await api.delete(`/reviews/${id}`);
-  } catch (error) {
-    console.error(`Error deleting review ${id}:`, error);
-    throw error;
+    await api.delete(`/categories/${id}`)
+    return { success: true }
+  } catch (e) {
+    console.warn(`Failed to delete category ${id}`, e)
+    return { success: false, error: e.message }
   }
-};
+}
 
-export const getFeaturedExhibits = async () => {
-  try {
-    const response = await api.get('/exhibits/featured');
-    return response;
-  } catch (error) {
-    console.error('Error fetching featured exhibits:', error);
-    throw error;
-  }
-};
-
-export const getExhibitsByCategory = async (category) => {
-  try {
-    const response = await api.get(`/exhibits/category/${category}`);
-    return response;
-  } catch (error) {
-    console.error(`Error fetching exhibits in category ${category}:`, error);
-    throw error;
-  }
-};
-
-export default api; 
+// (при необходимости) экспорт самого инстанса:
+export default api
